@@ -28,15 +28,19 @@ const Services = () => {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+      // Set initial state to visible first
+      gsap.set('.service-card', { opacity: 1, y: 0 });
+      
       gsap.from('.service-card', {
         scrollTrigger: {
           trigger: '.services-grid',
-          start: 'top 85%',
+          start: 'top 90%',
         },
-        y: 50,
+        y: 30,
         opacity: 0,
-        duration: 0.6,
-        stagger: 0.15,
+        duration: 0.5,
+        stagger: 0.1,
+        clearProps: 'all',
       });
     }, sectionRef);
 
