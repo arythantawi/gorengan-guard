@@ -7,6 +7,7 @@ import Services from '@/components/Services';
 import Facilities from '@/components/Facilities';
 import PopularRoutes from '@/components/PopularRoutes';
 import AllRoutes from '@/components/AllRoutes';
+import PremiumServices from '@/components/PremiumServices';
 import Features from '@/components/Features';
 import PaymentInfo from '@/components/PaymentInfo';
 import Footer from '@/components/Footer';
@@ -49,6 +50,7 @@ const Index = () => {
           <PopularRoutes />
         </section>
         <AllRoutes />
+        <PremiumServices />
         <Features />
         <section id="pembayaran">
           <PaymentInfo />
