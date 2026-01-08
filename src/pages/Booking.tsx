@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Clock, MapPin, Users, Calendar, User, Phone, Mail, MapPinned, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Clock, MapPin, Users, Calendar, User, Phone, Mail, MapPinned, CheckCircle, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -10,6 +10,7 @@ import PaymentInfoBooking from '@/components/PaymentInfoBooking';
 import PaymentUpload from '@/components/PaymentUpload';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { generateTicketPdf } from '@/lib/generateTicketPdf';
 
 // Price per passenger based on route (simplified)
 const PRICE_PER_PASSENGER: { [key: string]: number } = {
@@ -191,11 +192,35 @@ const Booking = () => {
                     <span className="font-bold text-accent">{formatPrice(totalPrice)}</span>
                   </div>
                 </div>
-              </div>
+                </div>
               
-              <Button onClick={() => navigate('/')} className="btn-gold">
-                Kembali ke Beranda
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Button 
+                  onClick={() => generateTicketPdf({
+                    orderId: orderId,
+                    customerName: formData.name,
+                    customerPhone: formData.phone,
+                    customerEmail: formData.email,
+                    routeFrom: from,
+                    routeTo: to,
+                    routeVia: via,
+                    travelDate: date,
+                    pickupTime: pickupTime,
+                    pickupAddress: formData.pickupAddress,
+                    passengers: passengers,
+                    totalPrice: totalPrice,
+                    notes: formData.notes,
+                  })}
+                  variant="outline"
+                  className="flex items-center gap-2"
+                >
+                  <Printer className="w-4 h-4" />
+                  Cetak Tiket PDF
+                </Button>
+                <Button onClick={() => navigate('/')} className="btn-gold">
+                  Kembali ke Beranda
+                </Button>
+              </div>
             </div>
           </div>
         </main>
