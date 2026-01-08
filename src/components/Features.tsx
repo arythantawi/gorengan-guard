@@ -54,7 +54,7 @@ const Features = () => {
         stagger: 0.1,
       });
 
-      gsap.from('.info-card', {
+      gsap.from('.info-section', {
         scrollTrigger: {
           trigger: '.info-section',
           start: 'top 85%',
