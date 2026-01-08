@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MapPin, Calendar, Users, Search, ArrowRight, ArrowLeftRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 const cities = [
   'Surabaya', 'Malang', 'Denpasar', 'Blitar', 'Kediri', 
@@ -9,6 +11,7 @@ const cities = [
 ];
 
 const RouteSearch = () => {
+  const navigate = useNavigate();
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
   const [date, setDate] = useState('');
@@ -21,8 +24,26 @@ const RouteSearch = () => {
   };
 
   const handleSearch = () => {
-    // Will be connected to booking flow
-    console.log({ origin, destination, date, passengers });
+    if (!origin || !destination) {
+      toast.error('Pilih kota asal dan tujuan');
+      return;
+    }
+    if (!date) {
+      toast.error('Pilih tanggal keberangkatan');
+      return;
+    }
+    if (origin === destination) {
+      toast.error('Kota asal dan tujuan tidak boleh sama');
+      return;
+    }
+    
+    const params = new URLSearchParams({
+      from: origin,
+      to: destination,
+      date: date,
+      passengers: passengers,
+    });
+    navigate(`/search?${params.toString()}`);
   };
 
   return (
