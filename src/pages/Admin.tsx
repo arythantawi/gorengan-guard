@@ -11,8 +11,10 @@ import {
   MapPin, 
   Phone,
   Clock,
-  Filter
+  Filter,
+  Printer
 } from 'lucide-react';
+import { generateTicketPdf } from '@/lib/generateTicketPdf';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -366,6 +368,31 @@ const Admin = () => {
                         className="w-full"
                       >
                         Aktifkan Kembali
+                      </Button>
+                    )}
+
+                    {booking.payment_status === 'paid' && (
+                      <Button
+                        onClick={() => generateTicketPdf({
+                          orderId: booking.order_id,
+                          customerName: booking.customer_name,
+                          customerPhone: booking.customer_phone,
+                          customerEmail: booking.customer_email,
+                          routeFrom: booking.route_from,
+                          routeTo: booking.route_to,
+                          routeVia: booking.route_via,
+                          travelDate: booking.travel_date,
+                          pickupTime: booking.pickup_time,
+                          pickupAddress: booking.pickup_address,
+                          passengers: booking.passengers,
+                          totalPrice: booking.total_price,
+                          notes: booking.notes,
+                        })}
+                        variant="outline"
+                        className="w-full"
+                      >
+                        <Printer className="w-4 h-4 mr-2" />
+                        Cetak Tiket PDF
                       </Button>
                     )}
                   </div>
