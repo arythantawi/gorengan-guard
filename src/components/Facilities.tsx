@@ -1,39 +1,33 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-// Import facility illustrations
-import facilityFerry from '@/assets/facility-ferry.png';
-import facilityFood from '@/assets/facility-food.png';
-import facilityDriver from '@/assets/facility-driver.png';
-import facilityCalendar from '@/assets/facility-calendar.png';
-import facilityDoorToDoor from '@/assets/facility-doorToDoor.png';
+import { Ship, Utensils, UserCheck, CalendarDays, MapPinned } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const facilities = [
   {
-    image: facilityFerry,
+    icon: Ship,
     text: 'Sudah Termasuk Tiket Penyebrangan',
     description: 'Tidak perlu repot beli tiket ferry terpisah',
   },
   {
-    image: facilityFood,
+    icon: Utensils,
     text: 'Free Makan 1x dan Snack',
     description: 'Nikmati makanan gratis selama perjalanan',
   },
   {
-    image: facilityDriver,
+    icon: UserCheck,
     text: 'Driver Berpengalaman',
     description: 'Sopir profesional dan ramah',
   },
   {
-    image: facilityCalendar,
+    icon: CalendarDays,
     text: 'Berangkat Setiap Hari',
     description: 'Jadwal fleksibel sesuai kebutuhan',
   },
   {
-    image: facilityDoorToDoor,
+    icon: MapPinned,
     text: 'Door To Door Service',
     description: 'Antar jemput langsung ke lokasi',
   },
@@ -120,12 +114,8 @@ const Facilities = () => {
               key={index}
               className="facility-card group bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/20 hover:border-white/40 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl"
             >
-              <div className="facility-icon w-20 h-20 mx-auto mb-4 rounded-2xl bg-white/90 flex items-center justify-center group-hover:scale-110 transition-all duration-300 overflow-hidden p-2">
-                <img 
-                  src={facility.image} 
-                  alt={facility.text} 
-                  className="w-full h-full object-contain"
-                />
+              <div className="facility-icon w-20 h-20 mx-auto mb-4 rounded-2xl bg-white/20 flex items-center justify-center group-hover:bg-white group-hover:scale-110 transition-all duration-300">
+                <facility.icon className="w-10 h-10 text-primary-foreground group-hover:text-primary transition-colors duration-300" strokeWidth={1.5} />
               </div>
               <h3 className="font-display text-sm md:text-base font-bold text-primary-foreground text-center mb-2 leading-tight">
                 {facility.text}
