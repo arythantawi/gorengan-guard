@@ -117,7 +117,7 @@ const initialForm: TripForm = {
   expense_ferry: '0',
   expense_snack: '0',
   expense_meals: '0',
-  expense_driver_commission: '0',
+  expense_driver_commission: '15',
   expense_driver_meals: '0',
   expense_toll: '0',
   expense_parking: '0',
@@ -163,6 +163,10 @@ const AdminOperations = () => {
   const handleOpenDialog = (trip?: TripOperation) => {
     if (trip) {
       setEditingTrip(trip);
+      // Calculate percentage from saved commission value
+      const commissionPercent = trip.income_tickets > 0 
+        ? Math.round((trip.expense_driver_commission / trip.income_tickets) * 100) 
+        : 15;
       setForm({
         trip_date: trip.trip_date,
         route_from: trip.route_from,
@@ -176,7 +180,7 @@ const AdminOperations = () => {
         expense_ferry: trip.expense_ferry.toString(),
         expense_snack: trip.expense_snack.toString(),
         expense_meals: trip.expense_meals.toString(),
-        expense_driver_commission: trip.expense_driver_commission.toString(),
+        expense_driver_commission: commissionPercent.toString(),
         expense_driver_meals: trip.expense_driver_meals.toString(),
         expense_toll: trip.expense_toll.toString(),
         expense_parking: trip.expense_parking.toString(),
@@ -219,7 +223,7 @@ const AdminOperations = () => {
         expense_ferry: parseInt(form.expense_ferry) || 0,
         expense_snack: parseInt(form.expense_snack) || 0,
         expense_meals: parseInt(form.expense_meals) || 0,
-        expense_driver_commission: parseInt(form.expense_driver_commission) || 0,
+        expense_driver_commission: Math.round((parseInt(form.income_tickets) || 0) * (parseFloat(form.expense_driver_commission) || 0) / 100),
         expense_driver_meals: parseInt(form.expense_driver_meals) || 0,
         expense_toll: parseInt(form.expense_toll) || 0,
         expense_parking: parseInt(form.expense_parking) || 0,
@@ -592,14 +596,22 @@ const AdminOperations = () => {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="expense_driver_commission" className="flex items-center gap-1">
-                        <Wallet className="w-3 h-3" /> Komisi Supir (Rp)
+                        <Wallet className="w-3 h-3" /> Komisi Supir (%)
                       </Label>
-                      <Input
-                        id="expense_driver_commission"
-                        type="number"
-                        value={form.expense_driver_commission}
-                        onChange={(e) => setForm({...form, expense_driver_commission: e.target.value})}
-                      />
+                      <div className="flex items-center gap-2">
+                        <Input
+                          id="expense_driver_commission"
+                          type="number"
+                          min="0"
+                          max="100"
+                          value={form.expense_driver_commission}
+                          onChange={(e) => setForm({...form, expense_driver_commission: e.target.value})}
+                          className="w-20"
+                        />
+                        <span className="text-sm text-muted-foreground">
+                          = {formatPrice(Math.round((parseInt(form.income_tickets) || 0) * (parseFloat(form.expense_driver_commission) || 0) / 100))}
+                        </span>
+                      </div>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="expense_driver_meals">Uang Makan Supir (Rp)</Label>
@@ -741,7 +753,9 @@ const AdminOperations = () => {
                           {trip.expense_fuel > 0 && <div>Solar: {formatPrice(trip.expense_fuel)}</div>}
                           {trip.expense_ferry > 0 && <div>Ferry: {formatPrice(trip.expense_ferry)}</div>}
                           {trip.expense_meals > 0 && <div>Makan: {formatPrice(trip.expense_meals)}</div>}
-                          {trip.expense_driver_commission > 0 && <div>Komisi: {formatPrice(trip.expense_driver_commission)}</div>}
+                          {trip.expense_driver_commission > 0 && (
+                            <div>Komisi ({trip.income_tickets > 0 ? Math.round((trip.expense_driver_commission / trip.income_tickets) * 100) : 0}%): {formatPrice(trip.expense_driver_commission)}</div>
+                          )}
                         </div>
                       </div>
                       <div className={`rounded-lg p-3 ${profit >= 0 ? 'bg-blue-50 dark:bg-blue-900/20' : 'bg-orange-50 dark:bg-orange-900/20'}`}>

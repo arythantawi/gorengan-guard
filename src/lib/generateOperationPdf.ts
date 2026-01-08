@@ -184,7 +184,12 @@ export const generateOperationPdf = (trip: TripOperation): void => {
   if (trip.expense_ferry > 0) drawTableRow('Penyebrangan (Ferry)', formatPrice(trip.expense_ferry));
   if (trip.expense_snack > 0) drawTableRow('Snack', formatPrice(trip.expense_snack));
   if (trip.expense_meals > 0) drawTableRow('Makan Penumpang', formatPrice(trip.expense_meals));
-  if (trip.expense_driver_commission > 0) drawTableRow('Komisi Sopir', formatPrice(trip.expense_driver_commission));
+  if (trip.expense_driver_commission > 0) {
+    const commissionPercent = trip.income_tickets > 0 
+      ? Math.round((trip.expense_driver_commission / trip.income_tickets) * 100) 
+      : 0;
+    drawTableRow(`Komisi Sopir (${commissionPercent}%)`, formatPrice(trip.expense_driver_commission));
+  }
   if (trip.expense_driver_meals > 0) drawTableRow('Uang Makan Sopir', formatPrice(trip.expense_driver_meals));
   if (trip.expense_toll > 0) drawTableRow('Tol', formatPrice(trip.expense_toll));
   if (trip.expense_parking > 0) drawTableRow('Parkir', formatPrice(trip.expense_parking));
