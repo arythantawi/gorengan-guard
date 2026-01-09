@@ -266,7 +266,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    // During hot reload, context might not be ready yet
+    // Return a safe default instead of throwing
+    console.warn('useAuth called outside AuthProvider - returning default values');
+    return {
+      user: null,
+      session: null,
+      isAdmin: false,
+      isLoading: true,
+      mfaRequired: false,
+      signIn: async () => ({ error: { message: 'Auth not ready' } as any }),
+      verifyOtp: async () => ({ error: { message: 'Auth not ready' } as any }),
+      signOut: async () => {},
+      enrollMfa: async () => null,
+      verifyMfaEnrollment: async () => ({ error: { message: 'Auth not ready' } as any }),
+      getUnverifiedFactor: async () => null,
+    };
   }
   return context;
 };

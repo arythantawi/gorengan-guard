@@ -48,13 +48,16 @@ const AdminLogin = () => {
         return;
       }
 
-      if (result.mfaRequired) {
+      if ('mfaRequired' in result && result.mfaRequired) {
         // MFA already set up and verified, show OTP input
         return;
       }
 
       // Need to enroll or re-enroll MFA (handles both new enrollment and unverified factors)
-      if (result.needsEnrollment || result.hasUnverifiedFactor) {
+      const needsEnrollment = 'needsEnrollment' in result && result.needsEnrollment;
+      const hasUnverifiedFactor = 'hasUnverifiedFactor' in result && result.hasUnverifiedFactor;
+      
+      if (needsEnrollment || hasUnverifiedFactor) {
         const mfaData = await enrollMfa();
         if (mfaData) {
           setQrCode(mfaData.qrCode);
