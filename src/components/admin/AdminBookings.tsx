@@ -16,6 +16,7 @@ import {
   Trash2,
   Eye
 } from 'lucide-react';
+import OfflineBookingForm from './OfflineBookingForm';
 import { generateTicketPdf } from '@/lib/generateTicketPdf';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -279,6 +280,12 @@ Terima kasih! 🙏`;
 
   return (
     <div className="space-y-6">
+      {/* Header with Offline Booking Button */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h2 className="text-lg font-semibold">Daftar Pesanan</h2>
+        <OfflineBookingForm onBookingCreated={fetchBookings} />
+      </div>
+
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
