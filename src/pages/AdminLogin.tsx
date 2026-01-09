@@ -19,6 +19,29 @@ const AdminLogin = forwardRef<HTMLDivElement>((_, ref) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
 
+  // Log activity function
+  const logActivity = async (
+    action: string, 
+    status: string, 
+    userId?: string, 
+    userEmail?: string,
+    details?: Record<string, unknown>
+  ) => {
+    try {
+      // Using any cast as types may not be updated yet
+      await (supabase.from('admin_activity_logs') as any).insert({
+        user_id: userId || null,
+        user_email: userEmail || null,
+        action,
+        status,
+        user_agent: navigator.userAgent,
+        details: details || null,
+      });
+    } catch (err) {
+      console.error('Failed to log activity:', err);
+    }
+  };
+
   // Redirect if already logged in as admin
   useEffect(() => {
     if (!isLoading && user && isAdmin) {
@@ -39,43 +62,66 @@ const AdminLogin = forwardRef<HTMLDivElement>((_, ref) => {
       });
 
       if (error) {
-        setLoginError(error.message === 'Invalid login credentials' 
+        const errorMessage = error.message === 'Invalid login credentials' 
           ? 'Email atau password salah' 
-          : error.message);
+          : error.message;
+        
+        setLoginError(errorMessage);
+        
+        // Log failed login attempt
+        await logActivity('admin_login', 'failed', undefined, email, {
+          error: error.message,
+        });
+        
         toast({
           variant: 'destructive',
           title: 'Login Gagal',
-          description: error.message === 'Invalid login credentials' 
-            ? 'Email atau password salah' 
-            : error.message,
+          description: errorMessage,
         });
         return;
       }
 
       if (data.user) {
-        // Check if user has admin role
-        const { data: hasAdminRole, error: roleError } = await supabase.rpc('has_role', {
-          _user_id: data.user.id,
-          _role: 'admin'
-        });
+        // Check if user has admin role using direct query instead of RPC
+        const { data: roleData, error: roleError } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', data.user.id)
+          .eq('role', 'admin')
+          .maybeSingle();
 
         if (roleError) {
           console.error('Error checking role:', roleError);
           setLoginError('Gagal memeriksa hak akses');
+          
+          await logActivity('admin_login', 'error', data.user.id, data.user.email, {
+            error: 'Failed to check admin role',
+            roleError: roleError.message,
+          });
+          
           await supabase.auth.signOut();
           return;
         }
 
-        if (!hasAdminRole) {
+        if (!roleData) {
           setLoginError('Akun Anda tidak memiliki hak akses admin');
+          
+          await logActivity('admin_login', 'unauthorized', data.user.id, data.user.email, {
+            reason: 'User does not have admin role',
+          });
+          
           toast({
             variant: 'destructive',
             title: 'Akses Ditolak',
             description: 'Akun Anda tidak memiliki hak akses admin',
           });
+          
           await supabase.auth.signOut();
           return;
         }
+
+        // Log successful login
+        await logActivity('admin_login', 'success', data.user.id, data.user.email);
 
         toast({
           title: 'Berhasil',
@@ -88,6 +134,10 @@ const AdminLogin = forwardRef<HTMLDivElement>((_, ref) => {
     } catch (err) {
       console.error('Login error:', err);
       setLoginError('Terjadi kesalahan saat login');
+      
+      await logActivity('admin_login', 'error', undefined, email, {
+        error: err instanceof Error ? err.message : 'Unknown error',
+      });
     } finally {
       setIsSubmitting(false);
     }
