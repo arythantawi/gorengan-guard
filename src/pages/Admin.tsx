@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard,
   Calendar,
@@ -11,14 +12,22 @@ import { Button } from '@/components/ui/button';
 import AdminBookings from '@/components/admin/AdminBookings';
 import AdminSchedules from '@/components/admin/AdminSchedules';
 import AdminOperations from '@/components/admin/AdminOperations';
+import { useAuth } from '@/hooks/useAuth';
 
 const Admin = () => {
+  const navigate = useNavigate();
+  const { signOut, user } = useAuth();
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
     waitingVerification: 0,
     paid: 0,
   });
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/admin/login');
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -30,7 +39,7 @@ const Admin = () => {
               <LayoutDashboard className="w-6 h-6 text-primary" />
               <h1 className="text-xl font-bold text-foreground">Admin Dashboard</h1>
             </div>
-            <Button variant="ghost" size="sm" onClick={() => window.location.href = '/'}>
+            <Button variant="ghost" size="sm" onClick={handleSignOut}>
               <LogOut className="w-4 h-4 mr-2" />
               Keluar
             </Button>
