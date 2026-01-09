@@ -56,15 +56,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.log('Auth state changed:', event);
       setSession(session);
       setUser(session?.user ?? null);
-      
+
       if (session?.user) {
         // Check admin role
         const adminStatus = await checkAdminRole(session.user.id);
         setIsAdmin(adminStatus);
+
+        // Enforce MFA based on Authenticator Assurance Level (AAL)
+        try {
+          const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+          if (!error && data) {
+            const needsMfa = data.currentLevel === 'aal1' && data.nextLevel === 'aal2';
+            setMfaRequired(needsMfa);
+          }
+        } catch (e) {
+          console.warn('Failed to read AAL:', e);
+        }
       } else {
         setIsAdmin(false);
+        setMfaRequired(false);
       }
-      
+
       setIsLoading(false);
     });
 
@@ -72,12 +84,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      
+
       if (session?.user) {
         const adminStatus = await checkAdminRole(session.user.id);
         setIsAdmin(adminStatus);
+
+        try {
+          const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+          if (!error && data) {
+            const needsMfa = data.currentLevel === 'aal1' && data.nextLevel === 'aal2';
+            setMfaRequired(needsMfa);
+          }
+        } catch (e) {
+          console.warn('Failed to read AAL:', e);
+        }
+      } else {
+        setMfaRequired(false);
       }
-      
+
       setIsLoading(false);
     });
 
@@ -145,11 +169,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const enrollMfa = async (): Promise<{ qrCode: string; secret: string; factorId: string } | null> => {
+    console.log('Starting MFA enrollment...');
+
     // First, unenroll any existing unverified factors
     const { data: factorsData } = await supabase.auth.mfa.listFactors();
+    console.log('Existing factors:', factorsData);
+
     const unverifiedFactors = factorsData?.totp?.filter(f => (f.status as string) === 'unverified') || [];
-    
+
     for (const factor of unverifiedFactors) {
+      console.log('Unenrolling unverified factor:', factor.id);
       await supabase.auth.mfa.unenroll({ factorId: factor.id });
     }
 
@@ -161,9 +190,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     if (error) {
       console.error('MFA enrollment error:', error);
+      // If factor name already exists, it usually means TOTP is already enrolled (verified).
+      // In that case we should move user to OTP verification flow.
+      if ((error as any).code === 'mfa_factor_name_conflict') {
+        setMfaRequired(true);
+      }
       return null;
     }
 
+    console.log('MFA enrolled:', data.id);
     return {
       qrCode: data.totp.qr_code,
       secret: data.totp.secret,

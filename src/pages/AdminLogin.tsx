@@ -61,13 +61,23 @@ const AdminLogin = () => {
           setSecret(mfaData.secret);
           setFactorId(mfaData.factorId);
           setShowMfaSetup(true);
-        } else {
-          toast({
-            variant: 'destructive',
-            title: 'Error',
-            description: 'Gagal setup 2FA',
-          });
+          return;
         }
+
+        // If enroll failed because factor already exists, we should show OTP verification UI
+        if (mfaRequired) {
+          toast({
+            title: '2FA sudah aktif',
+            description: 'Buka Google Authenticator dan masukkan kode 6 digit.',
+          });
+          return;
+        }
+
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'Gagal menampilkan QR 2FA. Coba login ulang.',
+        });
       }
     } finally {
       setIsSubmitting(false);
