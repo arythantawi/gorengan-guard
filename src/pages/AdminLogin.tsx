@@ -44,7 +44,9 @@ const AdminLogin = () => {
 
   // Redirect if already logged in as admin
   useEffect(() => {
+    console.log('AdminLogin effect - isLoading:', isLoading, 'user:', !!user, 'isAdmin:', isAdmin);
     if (!isLoading && user && isAdmin) {
+      console.log('Redirecting to admin dashboard...');
       navigate('/admin', { replace: true });
     }
   }, [user, isAdmin, isLoading, navigate]);
