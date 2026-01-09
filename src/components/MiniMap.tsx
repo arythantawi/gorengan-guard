@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap, ZoomControl } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap, ZoomControl, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Crosshair, Search, Loader2, X } from 'lucide-react';
@@ -29,6 +29,8 @@ interface MiniMapProps {
   onLocationChange?: (lat: number, lng: number) => void;
   originalLat?: number;
   originalLng?: number;
+  clickToPlace?: boolean;
+  markerLabel?: string;
 }
 
 // Component to recenter map when coords change
@@ -189,17 +191,37 @@ const CenterButton = ({
   );
 };
 
+// Click to place marker component
+const ClickHandler = ({ 
+  onLocationChange 
+}: { 
+  onLocationChange?: (lat: number, lng: number) => void;
+}) => {
+  useMapEvents({
+    click(e) {
+      if (onLocationChange) {
+        onLocationChange(e.latlng.lat, e.latlng.lng);
+      }
+    },
+  });
+  return null;
+};
+
 // Draggable marker component
 const DraggableMarker = ({ 
   lat, 
   lng, 
   address, 
-  onLocationChange 
+  onLocationChange,
+  isDraggable = true,
+  markerLabel = "📍 Lokasi Penjemputan"
 }: { 
   lat: number; 
   lng: number; 
   address?: string;
   onLocationChange?: (lat: number, lng: number) => void;
+  isDraggable?: boolean;
+  markerLabel?: string;
 }) => {
   const markerRef = useRef<L.Marker>(null);
 
@@ -217,15 +239,15 @@ const DraggableMarker = ({
     <Marker 
       position={[lat, lng]} 
       icon={markerIcon}
-      draggable={!!onLocationChange}
+      draggable={isDraggable && !!onLocationChange}
       eventHandlers={eventHandlers}
       ref={markerRef}
     >
       <Popup>
         <div className="text-sm">
-          <p className="font-medium">📍 Lokasi Penjemputan</p>
+          <p className="font-medium">{markerLabel}</p>
           {address && <p className="text-xs mt-1 text-gray-600">{address.split('\n')[0]}</p>}
-          {onLocationChange && (
+          {onLocationChange && isDraggable && (
             <p className="text-xs mt-2 text-primary font-medium">↕️ Geser marker untuk koreksi lokasi</p>
           )}
         </div>
@@ -234,7 +256,7 @@ const DraggableMarker = ({
   );
 };
 
-const MiniMap = ({ lat, lng, address, onLocationChange, originalLat, originalLng }: MiniMapProps) => {
+const MiniMap = ({ lat, lng, address, onLocationChange, originalLat, originalLng, clickToPlace = false, markerLabel = "📍 Lokasi Penjemputan" }: MiniMapProps) => {
   const [origLat] = useState(originalLat ?? lat);
   const [origLng] = useState(originalLng ?? lng);
 
@@ -266,6 +288,7 @@ const MiniMap = ({ lat, lng, address, onLocationChange, originalLat, originalLng
         <ZoomControl position="topright" />
         <RecenterMap lat={lat} lng={lng} />
         {onLocationChange && <SearchBox onSelectLocation={handleSearchSelect} />}
+        {clickToPlace && onLocationChange && <ClickHandler onLocationChange={onLocationChange} />}
         <CenterButton 
           originalLat={origLat} 
           originalLng={origLng}
@@ -278,13 +301,17 @@ const MiniMap = ({ lat, lng, address, onLocationChange, originalLat, originalLng
           lng={lng} 
           address={address}
           onLocationChange={onLocationChange}
+          isDraggable={!clickToPlace}
+          markerLabel={markerLabel}
         />
       </MapContainer>
       
       {/* Hint overlay */}
       {onLocationChange && (
         <div className="absolute bottom-2 left-2 right-2 bg-black/70 text-white text-xs py-1.5 px-3 rounded-lg text-center pointer-events-none">
-          🔍 Cari alamat • 🖐️ Geser peta • 📍 Geser marker
+          {clickToPlace 
+            ? '🔍 Cari alamat • 👆 Klik peta untuk pilih lokasi' 
+            : '🔍 Cari alamat • 🖐️ Geser peta • 📍 Geser marker'}
         </div>
       )}
     </div>

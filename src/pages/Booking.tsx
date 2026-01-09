@@ -966,6 +966,8 @@ const Booking = () => {
                               originalLng={dropoffGpsCoords?.lng ?? 112.7521}
                               address={formData.dropoffAddress}
                               onLocationChange={handleDropoffMarkerDrag}
+                              clickToPlace={true}
+                              markerLabel="📍 Lokasi Pengantaran"
                             />
                           </Suspense>
                         </div>
