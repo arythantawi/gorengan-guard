@@ -13,7 +13,9 @@ import {
   User,
   Package,
   Luggage,
-  AlertCircle
+  AlertCircle,
+  Send,
+  CheckCircle2
 } from 'lucide-react';
 import { generateManifestPdf, ManifestData, ManifestPassenger } from '@/lib/generateManifestPdf';
 import { Button } from '@/components/ui/button';
@@ -51,6 +53,7 @@ interface Booking {
   pickup_time: string;
   travel_date: string;
   passengers: number;
+  total_price: number;
   payment_status: string;
   has_large_luggage: boolean | null;
   luggage_description: string | null;
@@ -75,9 +78,11 @@ const AdminManifest = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [tripOperations, setTripOperations] = useState<TripOperation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [dateFilter, setDateFilter] = useState<string>(new Date().toISOString().split('T')[0]);
   const [routeFilter, setRouteFilter] = useState<string>('all');
   const [isManifestDialogOpen, setIsManifestDialogOpen] = useState(false);
+  const [selectedBookingsGroup, setSelectedBookingsGroup] = useState<Booking[]>([]);
   const [manifestConfig, setManifestConfig] = useState({
     agentName: 'Obie Travel',
     driverName: '',
@@ -191,7 +196,79 @@ const AdminManifest = () => {
       vehicleNumber: matchingTrip?.vehicle_number || '',
     });
 
+    setSelectedBookingsGroup(bookingsGroup);
     setIsManifestDialogOpen(true);
+  };
+
+  // Check if trip already exists in operations
+  const isTripProcessed = (bookingsGroup: Booking[]) => {
+    if (bookingsGroup.length === 0) return false;
+    const firstBooking = bookingsGroup[0];
+    return tripOperations.some(trip => 
+      trip.trip_date === firstBooking.travel_date &&
+      trip.route_from === firstBooking.route_from &&
+      trip.route_to === firstBooking.route_to &&
+      trip.pickup_time === firstBooking.pickup_time
+    );
+  };
+
+  // Process manifest to operations
+  const handleProcessToOperations = async (bookingsGroup: Booking[]) => {
+    if (bookingsGroup.length === 0) return;
+
+    const firstBooking = bookingsGroup[0];
+    
+    // Check if already exists
+    if (isTripProcessed(bookingsGroup)) {
+      toast.error('Trip ini sudah ada di data operasional');
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      // Calculate totals
+      const totalPassengers = bookingsGroup.reduce((sum, b) => sum + b.passengers, 0);
+      const paidBookings = bookingsGroup.filter(b => b.payment_status === 'paid');
+      const incomeTickets = paidBookings.reduce((sum, b) => sum + b.total_price, 0);
+
+      const tripData = {
+        trip_date: firstBooking.travel_date,
+        route_from: firstBooking.route_from,
+        route_to: firstBooking.route_to,
+        route_via: firstBooking.route_via || null,
+        pickup_time: firstBooking.pickup_time,
+        total_passengers: totalPassengers,
+        income_tickets: incomeTickets,
+        income_other: 0,
+        expense_fuel: 0,
+        expense_ferry: 0,
+        expense_snack: 0,
+        expense_meals: 0,
+        expense_driver_commission: Math.round(incomeTickets * 0.15), // Default 15%
+        expense_driver_meals: 0,
+        expense_toll: 0,
+        expense_parking: 0,
+        expense_other: 0,
+        driver_name: manifestConfig.driverName || null,
+        driver_phone: manifestConfig.driverPhone || null,
+        vehicle_number: manifestConfig.vehicleNumber || null,
+        notes: `Auto-generated dari manifest. ${bookingsGroup.length} booking, ${paidBookings.length} lunas.`,
+      };
+
+      const { error } = await supabase
+        .from('trip_operations')
+        .insert([tripData]);
+
+      if (error) throw error;
+      
+      toast.success('Data berhasil dikirim ke Operasional');
+      fetchData(); // Refresh to update processed status
+    } catch (error) {
+      console.error('Error processing to operations:', error);
+      toast.error('Gagal mengirim data ke operasional');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const handleGenerateManifest = (bookingsGroup: Booking[]) => {
@@ -364,10 +441,27 @@ const AdminManifest = () => {
                         <p className="text-sm text-muted-foreground">Lunas</p>
                         <p className="text-lg font-bold text-green-600">{getPaidCount(bookingsGroup)}/{bookingsGroup.length}</p>
                       </div>
-                      <Button onClick={() => handleOpenManifestDialog(bookingsGroup)}>
-                        <FileDown className="w-4 h-4 mr-2" />
-                        Cetak Manifes
-                      </Button>
+                      <div className="flex gap-2">
+                        {isTripProcessed(bookingsGroup) ? (
+                          <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 gap-1 py-2">
+                            <CheckCircle2 className="w-4 h-4" />
+                            Sudah Diproses
+                          </Badge>
+                        ) : (
+                          <Button 
+                            variant="outline" 
+                            onClick={() => handleProcessToOperations(bookingsGroup)}
+                            disabled={isProcessing}
+                          >
+                            <Send className="w-4 h-4 mr-2" />
+                            {isProcessing ? 'Memproses...' : 'Proses'}
+                          </Button>
+                        )}
+                        <Button onClick={() => handleOpenManifestDialog(bookingsGroup)}>
+                          <FileDown className="w-4 h-4 mr-2" />
+                          Cetak
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -501,15 +595,25 @@ const AdminManifest = () => {
               />
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="gap-2 sm:gap-0">
             <Button variant="outline" onClick={() => setIsManifestDialogOpen(false)}>
               Batal
             </Button>
+            {!isTripProcessed(selectedBookingsGroup) && (
+              <Button 
+                variant="secondary"
+                onClick={() => {
+                  handleProcessToOperations(selectedBookingsGroup);
+                  setIsManifestDialogOpen(false);
+                }}
+                disabled={isProcessing}
+              >
+                <Send className="w-4 h-4 mr-2" />
+                Proses ke Operasional
+              </Button>
+            )}
             <Button onClick={() => {
-              const key = Object.keys(groupedBookings)[0];
-              if (key) {
-                handleGenerateManifest(groupedBookings[key]);
-              }
+              handleGenerateManifest(selectedBookingsGroup);
             }}>
               <FileDown className="w-4 h-4 mr-2" />
               Unduh PDF
