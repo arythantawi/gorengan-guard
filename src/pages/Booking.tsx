@@ -961,7 +961,7 @@ const Booking = () => {
                           ) : (
                             <>
                               <Navigation className="w-4 h-4 mr-2" />
-                              {dropoffGpsCoords ? 'Perbarui Lokasi GPS' : 'Dapatkan Lokasi Saat Ini'}
+                              {dropoffGpsCoords ? 'Perbarui Lokasi GPS' : 'Tentukan Lokasi Pengantaran'}
                             </>
                           )}
                         </Button>
