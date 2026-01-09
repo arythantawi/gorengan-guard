@@ -1,6 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Clock, MapPin, Users, Calendar, User, Phone, Mail, MapPinned, CheckCircle, Printer, Navigation, Edit3, Loader2 } from 'lucide-react';
+import { ArrowLeft, Clock, MapPin, Users, Calendar, User, Phone, Mail, MapPinned, CheckCircle, Printer, Navigation, Edit3, Loader2, Map } from 'lucide-react';
+
+// Lazy load MiniMap to avoid SSR issues with Leaflet
+const MiniMap = lazy(() => import('@/components/MiniMap'));
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -648,6 +651,25 @@ const Booking = () => {
                                 </p>
                               </div>
                             )}
+                            
+                            {/* Mini Map Preview */}
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2 text-sm font-medium text-green-800 dark:text-green-300">
+                                <Map className="w-4 h-4" />
+                                Preview Lokasi:
+                              </div>
+                              <Suspense fallback={
+                                <div className="w-full h-[200px] rounded-lg bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 flex items-center justify-center">
+                                  <Loader2 className="w-6 h-6 animate-spin text-green-600" />
+                                </div>
+                              }>
+                                <MiniMap 
+                                  lat={gpsCoords.lat} 
+                                  lng={gpsCoords.lng} 
+                                  address={formData.pickupAddress}
+                                />
+                              </Suspense>
+                            </div>
                           </div>
                         )}
                         
