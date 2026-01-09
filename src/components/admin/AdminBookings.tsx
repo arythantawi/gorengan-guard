@@ -55,6 +55,7 @@ interface Booking {
   customer_phone: string;
   customer_email: string | null;
   pickup_address: string;
+  dropoff_address: string | null;
   notes: string | null;
   route_from: string;
   route_to: string;
@@ -203,7 +204,7 @@ const AdminBookings = ({ onStatsUpdate }: AdminBookingsProps) => {
       ? `${booking.route_from} → ${booking.route_via} → ${booking.route_to}`
       : `${booking.route_from} → ${booking.route_to}`;
 
-    return `Halo ${booking.customer_name},
+    let message = `Halo ${booking.customer_name},
 
 Terima kasih telah memesan travel di *Obie Travel*.
 
@@ -213,7 +214,14 @@ Terima kasih telah memesan travel di *Obie Travel*.
 🛤️ Rute: ${route}
 📅 Tanggal: ${formattedDate}
 ⏰ Jam Jemput: ${booking.pickup_time}
-📍 Alamat Jemput: ${booking.pickup_address}
+📍 Alamat Jemput: ${booking.pickup_address}`;
+
+    if (booking.dropoff_address) {
+      message += `
+🎯 Alamat Antar: ${booking.dropoff_address}`;
+    }
+
+    message += `
 👥 Jumlah Penumpang: ${booking.passengers}
 💰 Total: ${formattedPrice}
 ━━━━━━━━━━━━━━━
@@ -222,6 +230,8 @@ Terima kasih telah memesan travel di *Obie Travel*.
 📎 *Tiket PDF terlampir di bawah pesan ini.*
 Mohon simpan tiket ini dan tunjukkan saat penjemputan.
 Terima kasih! 🙏`;
+
+    return message;
   };
 
   const handleSendTicketWhatsApp = (booking: Booking) => {
@@ -423,6 +433,12 @@ Terima kasih! 🙏`;
                               <p className="text-muted-foreground">Alamat Jemput</p>
                               <p className="font-medium">{selectedBooking.pickup_address}</p>
                             </div>
+                            {selectedBooking.dropoff_address && (
+                              <div className="col-span-2">
+                                <p className="text-muted-foreground">Alamat Pengantaran</p>
+                                <p className="font-medium">{selectedBooking.dropoff_address}</p>
+                              </div>
+                            )}
                             {selectedBooking.notes && (
                               <div className="col-span-2">
                                 <p className="text-muted-foreground">Catatan</p>

@@ -69,6 +69,7 @@ const Booking = () => {
     phone: '',
     email: '',
     pickupAddress: '',
+    dropoffAddress: '',
     notes: '',
   });
 
@@ -309,6 +310,7 @@ const Booking = () => {
           customer_phone: formData.phone,
           customer_email: formData.email || null,
           pickup_address: formData.pickupAddress,
+          dropoff_address: formData.dropoffAddress || null,
           notes: formData.notes || null,
           route_from: from,
           route_to: to,
@@ -404,6 +406,7 @@ const Booking = () => {
                     travelDate: travelDate,
                     pickupTime: pickupTime,
                     pickupAddress: formData.pickupAddress,
+                    dropoffAddress: formData.dropoffAddress,
                     passengers: passengers,
                     totalPrice: totalPrice,
                     notes: formData.notes,
@@ -773,6 +776,26 @@ const Booking = () => {
                         />
                       </div>
                     )}
+                  </div>
+
+                  {/* Alamat Pengantaran */}
+                  <div>
+                    <label className="block text-sm font-medium text-muted-foreground mb-2">
+                      Alamat Pengantaran / Tujuan (Opsional)
+                    </label>
+                    <div className="relative">
+                      <MapPin className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
+                      <Textarea
+                        name="dropoffAddress"
+                        value={formData.dropoffAddress}
+                        onChange={handleInputChange}
+                        placeholder="Masukkan alamat tujuan pengantaran (contoh: Terminal Purabaya, Jl. Bungurasih)"
+                        className="pl-10 min-h-[80px]"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      💡 Isi jika Anda ingin diantarkan ke lokasi tertentu di kota tujuan
+                    </p>
                   </div>
 
                   <div>

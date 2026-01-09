@@ -11,6 +11,7 @@ interface TicketData {
   travelDate: string;
   pickupTime: string;
   pickupAddress: string;
+  dropoffAddress?: string | null;
   passengers: number;
   totalPrice: number;
   notes?: string | null;
@@ -275,6 +276,23 @@ export const generateTicketPdf = (data: TicketData, options?: { returnBlob?: boo
   const addressLines = doc.splitTextToSize(data.pickupAddress, contentWidth);
   doc.text(addressLines, margin, y);
   y += addressLines.length * 5 + 5;
+  
+  // Dropoff Address
+  if (data.dropoffAddress) {
+    y += 5;
+    doc.setTextColor(...gray);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.text('ALAMAT PENGANTARAN', margin, y);
+    
+    y += 8;
+    doc.setTextColor(...black);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    const dropoffLines = doc.splitTextToSize(data.dropoffAddress, contentWidth);
+    doc.text(dropoffLines, margin, y);
+    y += dropoffLines.length * 5 + 5;
+  }
   
   // Notes
   if (data.notes) {
