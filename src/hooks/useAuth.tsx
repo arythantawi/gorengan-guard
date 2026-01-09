@@ -203,6 +203,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return { error };
   };
 
+  const normalizeQrCode = (qr: string) => {
+    const trimmed = (qr ?? '').trim();
+    if (!trimmed) return '';
+    if (trimmed.startsWith('data:')) return trimmed;
+    if (trimmed.startsWith('<svg')) {
+      return `data:image/svg+xml;utf8,${encodeURIComponent(trimmed)}`;
+    }
+    return trimmed;
+  };
+
   const enrollMfa = async (): Promise<{ qrCode: string; secret: string; factorId: string } | null> => {
     console.log('Starting MFA enrollment...');
 
@@ -235,7 +245,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     console.log('MFA enrolled:', data.id);
     return {
-      qrCode: data.totp.qr_code,
+      qrCode: normalizeQrCode(data.totp.qr_code),
       secret: data.totp.secret,
       factorId: data.id,
     };
@@ -309,7 +319,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setMfaRequired(false);
     
     return {
-      qrCode: data.totp.qr_code,
+      qrCode: normalizeQrCode(data.totp.qr_code),
       secret: data.totp.secret,
       factorId: data.id,
     };
