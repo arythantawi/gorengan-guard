@@ -7,12 +7,12 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { useToast } from '@/hooks/use-toast';
-import { Shield, Lock, Mail, Smartphone, Key, Loader2 } from 'lucide-react';
+import { Shield, Lock, Mail, Smartphone, Key, Loader2, RefreshCw } from 'lucide-react';
 
 const AdminLogin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, isAdmin, isLoading, mfaRequired, signIn, verifyOtp, enrollMfa, verifyMfaEnrollment } = useAuth();
+  const { user, isAdmin, isLoading, mfaRequired, signIn, verifyOtp, enrollMfa, verifyMfaEnrollment, resetMfa } = useAuth();
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -25,6 +25,7 @@ const AdminLogin = () => {
   const [secret, setSecret] = useState('');
   const [factorId, setFactorId] = useState('');
   const [enrollmentCode, setEnrollmentCode] = useState('');
+  const [isResetting, setIsResetting] = useState(false);
 
   useEffect(() => {
     if (!isLoading && user && isAdmin && !mfaRequired) {
@@ -111,6 +112,52 @@ const AdminLogin = () => {
       navigate('/admin');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleReset2FA = async () => {
+    if (!email || !password) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Masukkan email dan password terlebih dahulu',
+      });
+      return;
+    }
+
+    setIsResetting(true);
+    try {
+      // First sign in
+      const result = await signIn(email, password);
+      if (result.error) {
+        toast({
+          variant: 'destructive',
+          title: 'Login Gagal',
+          description: result.error.message,
+        });
+        return;
+      }
+
+      // Reset MFA (unenroll all, enroll new)
+      const mfaData = await resetMfa();
+      if (mfaData) {
+        setQrCode(mfaData.qrCode);
+        setSecret(mfaData.secret);
+        setFactorId(mfaData.factorId);
+        setShowMfaSetup(true);
+        toast({
+          title: '2FA Direset',
+          description: 'Scan QR code baru dengan Google Authenticator',
+        });
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'Gagal reset 2FA',
+        });
+      }
+    } finally {
+      setIsResetting(false);
     }
   };
 
@@ -328,7 +375,7 @@ const AdminLogin = () => {
                   </div>
                 </div>
 
-                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                <Button type="submit" className="w-full" disabled={isSubmitting || isResetting}>
                   {isSubmitting ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -336,6 +383,35 @@ const AdminLogin = () => {
                     </>
                   ) : (
                     'Masuk'
+                  )}
+                </Button>
+
+                <div className="relative my-4">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-border" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-card px-2 text-muted-foreground">atau</span>
+                  </div>
+                </div>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleReset2FA}
+                  disabled={isSubmitting || isResetting}
+                >
+                  {isResetting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Mereset 2FA...
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="w-4 h-4 mr-2" />
+                      Reset 2FA (QR Baru)
+                    </>
                   )}
                 </Button>
               </form>

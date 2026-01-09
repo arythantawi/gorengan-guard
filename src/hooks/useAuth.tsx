@@ -22,6 +22,7 @@ interface AuthContextType {
   enrollMfa: () => Promise<{ qrCode: string; secret: string; factorId: string } | null>;
   verifyMfaEnrollment: (code: string, factorId: string) => Promise<{ error: AuthError | null }>;
   getUnverifiedFactor: () => Promise<{ factorId: string } | null>;
+  resetMfa: () => Promise<{ qrCode: string; secret: string; factorId: string } | null>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -257,6 +258,44 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setMfaRequired(false);
   };
 
+  // Reset MFA: unenroll ALL factors (verified + unverified) then enroll fresh
+  const resetMfa = async (): Promise<{ qrCode: string; secret: string; factorId: string } | null> => {
+    console.log('Resetting MFA - unenrolling all factors...');
+    
+    const { data: factorsData } = await supabase.auth.mfa.listFactors();
+    console.log('Current factors:', factorsData);
+
+    // Unenroll ALL TOTP factors (both verified and unverified)
+    const allFactors = factorsData?.totp || [];
+    for (const factor of allFactors) {
+      console.log('Unenrolling factor:', factor.id, factor.status);
+      const { error } = await supabase.auth.mfa.unenroll({ factorId: factor.id });
+      if (error) {
+        console.error('Failed to unenroll factor:', error);
+      }
+    }
+
+    // Now enroll a new factor
+    const { data, error } = await supabase.auth.mfa.enroll({
+      factorType: 'totp',
+      friendlyName: 'Admin TOTP',
+    });
+
+    if (error) {
+      console.error('MFA enrollment error after reset:', error);
+      return null;
+    }
+
+    console.log('New MFA factor enrolled:', data.id);
+    setMfaRequired(false);
+    
+    return {
+      qrCode: data.totp.qr_code,
+      secret: data.totp.secret,
+      factorId: data.id,
+    };
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -271,6 +310,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         enrollMfa,
         verifyMfaEnrollment,
         getUnverifiedFactor,
+        resetMfa,
       }}
     >
       {children}
@@ -296,6 +336,7 @@ export const useAuth = () => {
       enrollMfa: async () => null,
       verifyMfaEnrollment: async () => ({ error: { message: 'Auth context not ready' } as any }),
       getUnverifiedFactor: async () => null,
+      resetMfa: async () => null,
     };
   }
   return context;
