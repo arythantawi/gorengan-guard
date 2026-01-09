@@ -12,6 +12,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -20,8 +33,9 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Plus, Loader2 } from 'lucide-react';
+import { Plus, Loader2, Check, ChevronsUpDown } from 'lucide-react';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 interface Schedule {
   id: string;
@@ -39,6 +53,7 @@ interface OfflineBookingFormProps {
 
 const OfflineBookingForm = ({ onBookingCreated }: OfflineBookingFormProps) => {
   const [open, setOpen] = useState(false);
+  const [scheduleOpen, setScheduleOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   
@@ -160,6 +175,10 @@ const OfflineBookingForm = ({ onBookingCreated }: OfflineBookingFormProps) => {
     return `${route} (${schedule.pickup_time})`;
   };
 
+  const getScheduleSearchString = (schedule: Schedule) => {
+    return `${schedule.route_from} ${schedule.route_to} ${schedule.route_via || ''} ${schedule.pickup_time} ${schedule.category}`.toLowerCase();
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -212,21 +231,63 @@ const OfflineBookingForm = ({ onBookingCreated }: OfflineBookingFormProps) => {
             />
           </div>
 
-          {/* Schedule Selection */}
+          {/* Schedule Selection with Search */}
           <div className="space-y-2">
             <Label>Pilih Jadwal *</Label>
-            <Select value={selectedScheduleId} onValueChange={setSelectedScheduleId}>
-              <SelectTrigger>
-                <SelectValue placeholder="Pilih jadwal perjalanan" />
-              </SelectTrigger>
-              <SelectContent>
-                {schedules.map((schedule) => (
-                  <SelectItem key={schedule.id} value={schedule.id}>
-                    {formatScheduleLabel(schedule)} - {formatPrice(schedule.price)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Popover open={scheduleOpen} onOpenChange={setScheduleOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={scheduleOpen}
+                  className="w-full justify-between h-auto min-h-10 py-2 text-left font-normal"
+                >
+                  {selectedSchedule ? (
+                    <div className="flex flex-col items-start gap-0.5">
+                      <span className="text-sm">{formatScheduleLabel(selectedSchedule)}</span>
+                      <span className="text-xs text-muted-foreground">{formatPrice(selectedSchedule.price)}</span>
+                    </div>
+                  ) : (
+                    <span className="text-muted-foreground">Cari dan pilih jadwal...</span>
+                  )}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[500px] p-0 bg-popover border shadow-lg z-50" align="start">
+                <Command>
+                  <CommandInput placeholder="Ketik rute, jam, atau kategori..." />
+                  <CommandList>
+                    <CommandEmpty>Jadwal tidak ditemukan.</CommandEmpty>
+                    <CommandGroup>
+                      {schedules.map((schedule) => (
+                        <CommandItem
+                          key={schedule.id}
+                          value={getScheduleSearchString(schedule)}
+                          onSelect={() => {
+                            setSelectedScheduleId(schedule.id);
+                            setScheduleOpen(false);
+                          }}
+                          className="flex items-center justify-between py-3 cursor-pointer"
+                        >
+                          <div className="flex flex-col gap-0.5">
+                            <span className="font-medium">{formatScheduleLabel(schedule)}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {schedule.category} • {formatPrice(schedule.price)}
+                            </span>
+                          </div>
+                          <Check
+                            className={cn(
+                              "h-4 w-4",
+                              selectedScheduleId === schedule.id ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </div>
 
           {/* Travel Details */}
