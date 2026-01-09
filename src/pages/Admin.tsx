@@ -6,7 +6,8 @@ import {
   ShoppingCart,
   Truck,
   FileText,
-  Home
+  Home,
+  BarChart3
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -14,6 +15,7 @@ import AdminBookings from '@/components/admin/AdminBookings';
 import AdminSchedules from '@/components/admin/AdminSchedules';
 import AdminOperations from '@/components/admin/AdminOperations';
 import AdminManifest from '@/components/admin/AdminManifest';
+import AdminAnalytics from '@/components/admin/AdminAnalytics';
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -71,7 +73,7 @@ const Admin = () => {
 
         {/* Tabs */}
         <Tabs defaultValue="bookings" className="space-y-6">
-          <TabsList className="grid w-full max-w-2xl grid-cols-4">
+          <TabsList className="grid w-full max-w-3xl grid-cols-5">
             <TabsTrigger value="bookings" className="flex items-center gap-2">
               <ShoppingCart className="w-4 h-4" />
               <span className="hidden sm:inline">Pesanan</span>
@@ -87,6 +89,10 @@ const Admin = () => {
             <TabsTrigger value="operations" className="flex items-center gap-2">
               <Truck className="w-4 h-4" />
               <span className="hidden sm:inline">Operasional</span>
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="flex items-center gap-2">
+              <BarChart3 className="w-4 h-4" />
+              <span className="hidden sm:inline">Analisa</span>
             </TabsTrigger>
           </TabsList>
 
@@ -104,6 +110,10 @@ const Admin = () => {
 
           <TabsContent value="operations">
             <AdminOperations />
+          </TabsContent>
+
+          <TabsContent value="analytics">
+            <AdminAnalytics />
           </TabsContent>
         </Tabs>
       </main>
