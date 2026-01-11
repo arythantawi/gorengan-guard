@@ -297,7 +297,7 @@ const Hero = () => {
                 </SplitText>
               </div>
               <div ref={titleLine2Ref} className="mt-2">
-                <SplitText charClassName="cursor-pointer transition-colors bg-gradient-to-r from-accent via-yellow-300 to-accent bg-clip-text text-transparent">
+                <SplitText charClassName="cursor-pointer transition-colors bg-gradient-to-r from-cyan-300 via-white to-cyan-300 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(103,232,249,0.5)]">
                   Seluruh Jawa & Bali
                 </SplitText>
               </div>
