@@ -30,29 +30,44 @@ const Services = () => {
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from('.service-title', {
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top 80%',
-        },
-        y: 40,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power3.out'
-      });
+    if (!sectionRef.current) return;
 
-      gsap.from('.service-card', {
-        scrollTrigger: {
-          trigger: '.services-grid',
-          start: 'top 85%',
-        },
-        y: 50,
-        opacity: 0,
-        duration: 0.6,
-        stagger: 0.15,
-        ease: 'power2.out'
-      });
+    const ctx = gsap.context(() => {
+      // Set initial visible state first (in case ScrollTrigger fails)
+      gsap.set('.service-title', { opacity: 1, y: 0 });
+      gsap.set('.service-card', { opacity: 1, y: 0 });
+
+      // Then animate from hidden state
+      gsap.fromTo('.service-title', 
+        { y: 40, opacity: 0 },
+        {
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top 85%',
+            toggleActions: 'play none none none',
+          },
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: 'power3.out'
+        }
+      );
+
+      gsap.fromTo('.service-card', 
+        { y: 50, opacity: 0 },
+        {
+          scrollTrigger: {
+            trigger: '.services-grid',
+            start: 'top 90%',
+            toggleActions: 'play none none none',
+          },
+          y: 0,
+          opacity: 1,
+          duration: 0.6,
+          stagger: 0.15,
+          ease: 'power2.out'
+        }
+      );
     }, sectionRef);
 
     return () => ctx.revert();
