@@ -10,7 +10,8 @@ import {
   Users,
   PieChart,
   Settings,
-  LayoutGrid
+  LayoutGrid,
+  Play
 } from 'lucide-react';
 import {
   Sidebar,
@@ -45,6 +46,7 @@ const managementItems = [
 const websiteItems = [
   { id: 'schedules', title: 'Jadwal', icon: Calendar },
   { id: 'content', title: 'Konten', icon: LayoutGrid },
+  { id: 'videos', title: 'Video', icon: Play },
 ];
 
 const reportItems = [
