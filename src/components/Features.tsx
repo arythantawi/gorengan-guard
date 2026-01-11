@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { MapPin, Calendar, Wallet, MousePointerClick, Car, Shield, Clock, Headphones } from 'lucide-react';
 import { Typewriter } from '@/hooks/use-typewriter';
+import { createSafeGsapContext, ensureElementsVisible } from '@/lib/gsapUtils';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -38,74 +39,62 @@ const Features = () => {
   const [showDescription, setShowDescription] = useState(false);
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from('.feature-title', {
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top 80%',
-        },
-        y: 40,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power3.out',
-        onComplete: () => setShowDescription(true),
-      });
+    const ctx = createSafeGsapContext(
+      sectionRef,
+      () => {
+        gsap.from('.feature-title', {
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top 80%',
+          },
+          y: 40,
+          opacity: 0,
+          duration: 0.8,
+          ease: 'power3.out',
+          clearProps: 'all',
+          onComplete: () => setShowDescription(true),
+        });
 
-      gsap.from('.feature-card', {
-        scrollTrigger: {
-          trigger: '.feature-grid',
-          start: 'top 85%',
-        },
-        y: 50,
-        opacity: 0,
-        duration: 0.5,
-        stagger: 0.1,
-        ease: 'power2.out'
-      });
+        gsap.from('.feature-card', {
+          scrollTrigger: {
+            trigger: '.feature-grid',
+            start: 'top 85%',
+          },
+          y: 50,
+          opacity: 0,
+          duration: 0.5,
+          stagger: 0.1,
+          ease: 'power2.out',
+          clearProps: 'all',
+        });
 
-      gsap.from('.info-section', {
-        scrollTrigger: {
-          trigger: '.info-section',
-          start: 'top 85%',
-        },
-        y: 30,
-        opacity: 0,
-        duration: 0.6,
-        ease: 'power2.out'
-      });
+        gsap.from('.info-section', {
+          scrollTrigger: {
+            trigger: '.info-section',
+            start: 'top 85%',
+          },
+          y: 30,
+          opacity: 0,
+          duration: 0.6,
+          ease: 'power2.out',
+          clearProps: 'all',
+        });
+      },
+      () => {
+        setShowDescription(true);
+        ensureElementsVisible(['.feature-title', '.feature-card', '.info-section']);
+      }
+    );
 
-      // Parallax for feature cards
-      gsap.to('.feature-card', {
-        yPercent: -8,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: '.feature-grid',
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: 1.5,
-        }
-      });
-
-      // Parallax for info section
-      gsap.to('.info-section', {
-        yPercent: -5,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: '.info-section',
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: 1,
-        }
-      });
-    }, sectionRef);
-
-    return () => ctx.revert();
+    return () => {
+      ctx?.revert();
+      ensureElementsVisible(['.feature-title', '.feature-card', '.info-section']);
+    };
   }, []);
 
   return (
     <section ref={sectionRef} className="py-20 bg-background">
       <div className="container">
-        {/* Header */}
         <div className="text-center mb-14 feature-title">
           <span className="inline-block px-5 py-2 bg-accent/10 text-accent rounded-full text-sm font-semibold mb-4">
             Mengapa Memilih Kami?
@@ -124,7 +113,6 @@ const Features = () => {
           </p>
         </div>
 
-        {/* Features Grid */}
         <div className="feature-grid grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16 max-w-6xl mx-auto">
           {features.map((feature, index) => (
             <div
@@ -144,7 +132,6 @@ const Features = () => {
           ))}
         </div>
 
-        {/* Info Section */}
         <div className="info-section bg-gradient-to-br from-primary/5 to-accent/5 rounded-3xl p-8 md:p-10 border border-primary/10 max-w-4xl mx-auto">
           <div className="flex flex-col md:flex-row items-start gap-6">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center flex-shrink-0 shadow-lg">

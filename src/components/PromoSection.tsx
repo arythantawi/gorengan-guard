@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Tag, Gift, Percent, Copy, Check } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { createSafeGsapContext, ensureElementsVisible } from '@/lib/gsapUtils';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -46,32 +47,43 @@ const PromoSection = () => {
   useEffect(() => {
     if (promos.length === 0) return;
 
-    const ctx = gsap.context(() => {
-      gsap.from('.promo-title', {
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top 80%',
-        },
-        y: 40,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power3.out'
-      });
+    const ctx = createSafeGsapContext(
+      sectionRef,
+      () => {
+        gsap.from('.promo-title', {
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top 80%',
+          },
+          y: 40,
+          opacity: 0,
+          duration: 0.8,
+          ease: 'power3.out',
+          clearProps: 'all',
+        });
 
-      gsap.from('.promo-card', {
-        scrollTrigger: {
-          trigger: '.promo-grid',
-          start: 'top 85%',
-        },
-        y: 50,
-        opacity: 0,
-        duration: 0.6,
-        stagger: 0.12,
-        ease: 'power2.out'
-      });
-    }, sectionRef);
+        gsap.from('.promo-card', {
+          scrollTrigger: {
+            trigger: '.promo-grid',
+            start: 'top 85%',
+          },
+          y: 50,
+          opacity: 0,
+          duration: 0.6,
+          stagger: 0.12,
+          ease: 'power2.out',
+          clearProps: 'all',
+        });
+      },
+      () => {
+        ensureElementsVisible(['.promo-title', '.promo-card']);
+      }
+    );
 
-    return () => ctx.revert();
+    return () => {
+      ctx?.revert();
+      ensureElementsVisible(['.promo-title', '.promo-card']);
+    };
   }, [promos.length]);
 
   if (isLoading || promos.length === 0) return null;
@@ -104,7 +116,6 @@ const PromoSection = () => {
               key={promo.id}
               className="promo-card group bg-card rounded-2xl border border-border p-7 hover:shadow-xl transition-all duration-500 relative overflow-hidden hover:-translate-y-1"
             >
-              {/* Decorative gradient */}
               <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-accent/10 to-transparent rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500" />
               
               <div className="relative z-10">

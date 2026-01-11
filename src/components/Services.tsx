@@ -4,6 +4,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CalendarClock, Wallet, Smartphone, ArrowRight, MapPin, ChevronDown, Search, FileText, CreditCard, CheckCircle, MessageCircle } from 'lucide-react';
 import { getRoutePrice } from '@/lib/scheduleData';
+import { createSafeGsapContext, ensureElementsVisible, prefersReducedMotion } from '@/lib/gsapUtils';
 import {
   Dialog,
   DialogContent,
@@ -98,71 +99,71 @@ const Services = () => {
   const [openCategory, setOpenCategory] = useState<string | null>('Jawa - Bali');
   const [openPriceCategory, setOpenPriceCategory] = useState<string | null>('Jawa - Bali');
 
-  // GSAP animation for Schedule Dialog
+  // GSAP animation for Schedule Dialog - with safety checks
   useEffect(() => {
-    if (showSchedule && scheduleDialogRef.current) {
-      const ctx = gsap.context(() => {
-        gsap.fromTo(
-          '.schedule-header',
-          { y: -20, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.4, ease: 'power3.out' }
-        );
-        gsap.fromTo(
-          '.schedule-category',
-          { x: -30, opacity: 0 },
-          { x: 0, opacity: 1, duration: 0.5, stagger: 0.1, ease: 'power2.out', delay: 0.2 }
-        );
-      }, scheduleDialogRef);
-      return () => ctx.revert();
-    }
+    if (!showSchedule || !scheduleDialogRef.current || prefersReducedMotion()) return;
+    
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        '.schedule-header',
+        { y: -20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.4, ease: 'power3.out', clearProps: 'all' }
+      );
+      gsap.fromTo(
+        '.schedule-category',
+        { x: -30, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.5, stagger: 0.1, ease: 'power2.out', delay: 0.2, clearProps: 'all' }
+      );
+    }, scheduleDialogRef);
+    return () => ctx.revert();
   }, [showSchedule]);
 
-  // GSAP animation for Price Dialog
+  // GSAP animation for Price Dialog - with safety checks
   useEffect(() => {
-    if (showPrice && priceDialogRef.current) {
-      const ctx = gsap.context(() => {
-        gsap.fromTo(
-          '.price-header',
-          { y: -20, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.4, ease: 'power3.out' }
-        );
-        gsap.fromTo(
-          '.price-category',
-          { x: 30, opacity: 0 },
-          { x: 0, opacity: 1, duration: 0.5, stagger: 0.1, ease: 'power2.out', delay: 0.2 }
-        );
-      }, priceDialogRef);
-      return () => ctx.revert();
-    }
+    if (!showPrice || !priceDialogRef.current || prefersReducedMotion()) return;
+    
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        '.price-header',
+        { y: -20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.4, ease: 'power3.out', clearProps: 'all' }
+      );
+      gsap.fromTo(
+        '.price-category',
+        { x: 30, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.5, stagger: 0.1, ease: 'power2.out', delay: 0.2, clearProps: 'all' }
+      );
+    }, priceDialogRef);
+    return () => ctx.revert();
   }, [showPrice]);
 
-  // GSAP animation for Booking Dialog
+  // GSAP animation for Booking Dialog - with safety checks
   useEffect(() => {
-    if (showBooking && bookingDialogRef.current) {
-      const ctx = gsap.context(() => {
-        gsap.fromTo(
-          '.booking-header',
-          { y: -20, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.4, ease: 'power3.out' }
-        );
-        gsap.fromTo(
-          '.booking-step',
-          { y: 30, opacity: 0, scale: 0.95 },
-          { y: 0, opacity: 1, scale: 1, duration: 0.5, stagger: 0.12, ease: 'back.out(1.2)', delay: 0.2 }
-        );
-        gsap.fromTo(
-          '.booking-tips',
-          { y: 20, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.5, ease: 'power2.out', delay: 0.8 }
-        );
-        gsap.fromTo(
-          '.booking-cta',
-          { y: 20, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.5, ease: 'power2.out', delay: 1 }
-        );
-      }, bookingDialogRef);
-      return () => ctx.revert();
-    }
+    if (!showBooking || !bookingDialogRef.current || prefersReducedMotion()) return;
+    
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        '.booking-header',
+        { y: -20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.4, ease: 'power3.out', clearProps: 'all' }
+      );
+      gsap.fromTo(
+        '.booking-step',
+        { y: 30, opacity: 0, scale: 0.95 },
+        { y: 0, opacity: 1, scale: 1, duration: 0.5, stagger: 0.12, ease: 'back.out(1.2)', delay: 0.2, clearProps: 'all' }
+      );
+      gsap.fromTo(
+        '.booking-tips',
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.5, ease: 'power2.out', delay: 0.8, clearProps: 'all' }
+      );
+      gsap.fromTo(
+        '.booking-cta',
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.5, ease: 'power2.out', delay: 1, clearProps: 'all' }
+      );
+    }, bookingDialogRef);
+    return () => ctx.revert();
   }, [showBooking]);
 
   const handleServiceClick = (dialogType: string) => {
@@ -217,45 +218,54 @@ const Services = () => {
   };
 
   useEffect(() => {
-    if (!sectionRef.current) return;
+    const ctx = createSafeGsapContext(
+      sectionRef,
+      () => {
+        gsap.set('.service-title', { opacity: 1, y: 0 });
+        gsap.set('.service-card', { opacity: 1, y: 0 });
 
-    const ctx = gsap.context(() => {
-      gsap.set('.service-title', { opacity: 1, y: 0 });
-      gsap.set('.service-card', { opacity: 1, y: 0 });
+        gsap.fromTo('.service-title', 
+          { y: 40, opacity: 0 },
+          {
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: 'top 85%',
+              toggleActions: 'play none none none',
+            },
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            ease: 'power3.out',
+            clearProps: 'all',
+          }
+        );
 
-      gsap.fromTo('.service-title', 
-        { y: 40, opacity: 0 },
-        {
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top 85%',
-            toggleActions: 'play none none none',
-          },
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          ease: 'power3.out'
-        }
-      );
+        gsap.fromTo('.service-card', 
+          { y: 50, opacity: 0 },
+          {
+            scrollTrigger: {
+              trigger: '.services-grid',
+              start: 'top 90%',
+              toggleActions: 'play none none none',
+            },
+            y: 0,
+            opacity: 1,
+            duration: 0.6,
+            stagger: 0.15,
+            ease: 'power2.out',
+            clearProps: 'all',
+          }
+        );
+      },
+      () => {
+        ensureElementsVisible(['.service-title', '.service-card']);
+      }
+    );
 
-      gsap.fromTo('.service-card', 
-        { y: 50, opacity: 0 },
-        {
-          scrollTrigger: {
-            trigger: '.services-grid',
-            start: 'top 90%',
-            toggleActions: 'play none none none',
-          },
-          y: 0,
-          opacity: 1,
-          duration: 0.6,
-          stagger: 0.15,
-          ease: 'power2.out'
-        }
-      );
-    }, sectionRef);
-
-    return () => ctx.revert();
+    return () => {
+      ctx?.revert();
+      ensureElementsVisible(['.service-title', '.service-card']);
+    };
   }, []);
 
   return (

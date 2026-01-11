@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Star, Quote, MapPin, ChevronLeft, ChevronRight, User } from 'lucide-react';
+import { Typewriter } from '@/hooks/use-typewriter';
+import { createSafeGsapContext, ensureElementsVisible } from '@/lib/gsapUtils';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Typewriter } from '@/hooks/use-typewriter';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -45,79 +46,69 @@ const Testimonials = () => {
   useEffect(() => {
     if (testimonials.length === 0) return;
 
-    const ctx = gsap.context(() => {
-      gsap.from('.testimonial-title', {
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top 80%',
-        },
-        y: 40,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power3.out',
-        onComplete: () => setShowDescription(true),
-      });
+    const ctx = createSafeGsapContext(
+      sectionRef,
+      () => {
+        gsap.from('.testimonial-title', {
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top 80%',
+          },
+          y: 40,
+          opacity: 0,
+          duration: 0.8,
+          ease: 'power3.out',
+          clearProps: 'all',
+          onComplete: () => setShowDescription(true),
+        });
 
-      gsap.from('.testimonial-stats', {
-        scrollTrigger: {
-          trigger: '.testimonial-stats',
-          start: 'top 85%',
-        },
-        y: 30,
-        opacity: 0,
-        duration: 0.6,
-        stagger: 0.1,
-        ease: 'power2.out'
-      });
+        gsap.from('.testimonial-stats', {
+          scrollTrigger: {
+            trigger: '.testimonial-stats',
+            start: 'top 85%',
+          },
+          y: 30,
+          opacity: 0,
+          duration: 0.6,
+          stagger: 0.1,
+          ease: 'power2.out',
+          clearProps: 'all',
+        });
 
-      gsap.from('.testimonial-card', {
-        scrollTrigger: {
-          trigger: '.testimonial-card',
-          start: 'top 85%',
-        },
-        y: 50,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power2.out'
-      });
+        gsap.from('.testimonial-card', {
+          scrollTrigger: {
+            trigger: '.testimonial-card',
+            start: 'top 85%',
+          },
+          y: 50,
+          opacity: 0,
+          duration: 0.8,
+          ease: 'power2.out',
+          clearProps: 'all',
+        });
 
-      gsap.from('.testimonial-nav', {
-        scrollTrigger: {
-          trigger: '.testimonial-nav',
-          start: 'top 90%',
-        },
-        y: 20,
-        opacity: 0,
-        duration: 0.6,
-        ease: 'power2.out'
-      });
+        gsap.from('.testimonial-nav', {
+          scrollTrigger: {
+            trigger: '.testimonial-nav',
+            start: 'top 90%',
+          },
+          y: 20,
+          opacity: 0,
+          duration: 0.6,
+          ease: 'power2.out',
+          clearProps: 'all',
+        });
+      },
+      () => {
+        setShowDescription(true);
+        ensureElementsVisible(['.testimonial-title', '.testimonial-stats', '.testimonial-card', '.testimonial-nav']);
+      }
+    );
 
-      // Parallax for testimonial card
-      gsap.to('.testimonial-card', {
-        yPercent: -8,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: '.testimonial-card',
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: 1.5,
-        }
-      });
-
-      // Parallax for stats
-      gsap.to('.testimonial-stats', {
-        yPercent: -5,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: '.testimonial-stats',
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: 1,
-        }
-      });
-    }, sectionRef);
-
-    return () => ctx.revert();
+    return () => {
+      ctx?.revert();
+      ensureElementsVisible(['.testimonial-title', '.testimonial-stats', '.testimonial-card', '.testimonial-nav']);
+    };
   }, [testimonials.length]);
 
   // Animate on slide change
@@ -155,13 +146,11 @@ const Testimonials = () => {
     ));
   };
 
-  // Calculate average rating
   const averageRating = testimonials.reduce((sum, t) => sum + t.rating, 0) / testimonials.length;
 
   return (
     <section ref={sectionRef} className="py-20 bg-gradient-to-b from-background to-muted/30">
       <div className="container">
-        {/* Header */}
         <div className="testimonial-title text-center mb-14">
           <span className="inline-block px-5 py-2 bg-primary/10 text-primary rounded-full text-sm font-semibold mb-4">
             Testimoni Pelanggan
@@ -180,7 +169,6 @@ const Testimonials = () => {
           </p>
         </div>
 
-        {/* Stats */}
         <div className="testimonial-stats flex flex-wrap justify-center gap-8 md:gap-16 mb-14">
           <div className="text-center">
             <div className="text-4xl md:text-5xl font-bold text-primary mb-2">
@@ -205,33 +193,27 @@ const Testimonials = () => {
           </div>
         </div>
 
-        {/* Main Testimonial Card */}
         <div className="max-w-4xl mx-auto">
           <div 
             ref={cardRef}
             className="testimonial-card relative bg-card rounded-3xl p-8 md:p-12 border border-border/50 shadow-xl"
           >
-            {/* Quote decoration */}
             <div className="absolute -top-6 left-8 md:left-12">
               <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg">
                 <Quote className="w-6 h-6 text-primary-foreground" />
               </div>
             </div>
 
-            {/* Rating */}
             <div className="flex items-center gap-1 mb-6 pt-4">
               {renderStars(currentTestimonial.rating)}
             </div>
 
-            {/* Testimonial text */}
             <blockquote className="text-lg md:text-xl text-foreground leading-relaxed mb-8 font-medium">
               "{currentTestimonial.testimonial_text}"
             </blockquote>
 
-            {/* Customer info */}
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-4">
-                {/* Avatar */}
                 <div className="w-14 h-14 rounded-2xl overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
                   {currentTestimonial.customer_photo_url ? (
                     <img 
@@ -256,7 +238,6 @@ const Testimonials = () => {
                 </div>
               </div>
 
-              {/* Route badge */}
               {currentTestimonial.route_taken && (
                 <div className="px-4 py-2 bg-primary/10 text-primary text-sm font-medium rounded-full">
                   {currentTestimonial.route_taken}
@@ -265,7 +246,6 @@ const Testimonials = () => {
             </div>
           </div>
 
-          {/* Navigation */}
           <div className="testimonial-nav flex items-center justify-center gap-4 mt-8">
             <button
               onClick={goToPrevious}
@@ -274,7 +254,6 @@ const Testimonials = () => {
               <ChevronLeft className="w-5 h-5" />
             </button>
 
-            {/* Dots */}
             <div className="flex gap-2">
               {testimonials.map((_, index) => (
                 <button

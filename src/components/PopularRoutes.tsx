@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight, MapPin, Sparkles } from 'lucide-react';
 import { getRoutePrice } from '@/lib/scheduleData';
 import { Typewriter } from '@/hooks/use-typewriter';
+import { createSafeGsapContext, ensureElementsVisible } from '@/lib/gsapUtils';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -37,45 +38,45 @@ const PopularRoutes = () => {
   };
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from('.route-title', {
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top 80%',
-        },
-        y: 40,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power3.out',
-        onComplete: () => setShowDescription(true),
-      });
+    const ctx = createSafeGsapContext(
+      sectionRef,
+      () => {
+        gsap.from('.route-title', {
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top 80%',
+          },
+          y: 40,
+          opacity: 0,
+          duration: 0.8,
+          ease: 'power3.out',
+          clearProps: 'all',
+          onComplete: () => setShowDescription(true),
+        });
 
-      gsap.from('.route-card', {
-        scrollTrigger: {
-          trigger: cardsRef.current,
-          start: 'top 85%',
-        },
-        y: 60,
-        opacity: 0,
-        duration: 0.6,
-        stagger: 0.1,
-        ease: 'power2.out'
-      });
+        gsap.from('.route-card', {
+          scrollTrigger: {
+            trigger: cardsRef.current,
+            start: 'top 85%',
+          },
+          y: 60,
+          opacity: 0,
+          duration: 0.6,
+          stagger: 0.1,
+          ease: 'power2.out',
+          clearProps: 'all',
+        });
+      },
+      () => {
+        setShowDescription(true);
+        ensureElementsVisible(['.route-title', '.route-card']);
+      }
+    );
 
-      // Parallax for route cards
-      gsap.to('.route-card', {
-        yPercent: -12,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: cardsRef.current,
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: 1.5,
-        }
-      });
-    }, sectionRef);
-
-    return () => ctx.revert();
+    return () => {
+      ctx?.revert();
+      ensureElementsVisible(['.route-title', '.route-card']);
+    };
   }, []);
 
   return (
