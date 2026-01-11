@@ -76,58 +76,61 @@ const Hero = () => {
   const [showBadge, setShowBadge] = useState(false);
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        defaults: {
-          ease: 'power4.out'
+    // Small delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      const ctx = gsap.context(() => {
+        const tl = gsap.timeline({
+          defaults: {
+            ease: 'power4.out'
+          }
+        });
+
+        // Get all characters for animation
+        const line1Chars = titleLine1Ref.current?.querySelectorAll('.hero-char') || [];
+        const line2Chars = titleLine2Ref.current?.querySelectorAll('.hero-char') || [];
+
+        // Only animate if elements exist
+        if (line1Chars.length === 0 && line2Chars.length === 0) {
+          setShowSubtitle(true);
+          setShowBadge(true);
+          return;
         }
-      });
 
-      // Get all characters and words for animation
-      const line1Chars = titleLine1Ref.current?.querySelectorAll('.hero-char') || [];
-      const line2Chars = titleLine2Ref.current?.querySelectorAll('.hero-char') || [];
+        // Set initial state for characters
+        gsap.set([line1Chars, line2Chars], {
+          opacity: 0,
+          y: 40,
+          rotateX: -45,
+          transformOrigin: 'top center',
+        });
 
-      // Set initial state for characters
-      gsap.set([line1Chars, line2Chars], {
-        opacity: 0,
-        y: 80,
-        rotateX: -90,
-        transformOrigin: 'top center',
-      });
-
-      // Badge animation
-      tl.from(badgeRef.current, {
-        y: -30,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'back.out(1.7)',
-        onComplete: () => setShowBadge(true)
-      })
-      // Line 1 character animation - wave effect
-      .to(line1Chars, {
-        opacity: 1,
-        y: 0,
-        rotateX: 0,
-        duration: 0.8,
-        stagger: {
-          each: 0.03,
-          ease: 'power2.out'
-        },
-        ease: 'power4.out'
-      }, '-=0.3')
-      // Line 2 character animation - wave effect with gradient text
-      .to(line2Chars, {
-        opacity: 1,
-        y: 0,
-        rotateX: 0,
-        duration: 0.8,
-        stagger: {
-          each: 0.025,
-          ease: 'power2.out'
-        },
-        ease: 'back.out(1.2)',
-        onComplete: () => setShowSubtitle(true)
-      }, '-=0.5')
+        // Badge animation
+        tl.from(badgeRef.current, {
+          y: -20,
+          opacity: 0,
+          duration: 0.6,
+          ease: 'back.out(1.7)',
+          onComplete: () => setShowBadge(true)
+        })
+        // Line 1 character animation
+        .to(line1Chars, {
+          opacity: 1,
+          y: 0,
+          rotateX: 0,
+          duration: 0.6,
+          stagger: 0.02,
+          ease: 'power3.out'
+        }, '-=0.2')
+        // Line 2 character animation
+        .to(line2Chars, {
+          opacity: 1,
+          y: 0,
+          rotateX: 0,
+          duration: 0.6,
+          stagger: 0.02,
+          ease: 'power3.out',
+          onComplete: () => setShowSubtitle(true)
+        }, '-=0.4')
       // Stats animation
       .from(statsRef.current?.children || [], {
         y: 40,
@@ -275,8 +278,11 @@ const Hero = () => {
         });
       }
 
-    }, heroRef);
-    return () => ctx.revert();
+      }, heroRef);
+      return () => ctx.revert();
+    }, 50);
+
+    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -322,17 +328,15 @@ const Hero = () => {
 
             {/* Title with split text animation */}
             <h1 className="font-display text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.1] mb-8">
-              <div ref={titleLine1Ref} className="overflow-hidden pb-2">
+              <div ref={titleLine1Ref} className="pb-2">
                 <SplitText charClassName="text-white">
                   Perjalanan Nyaman ke
                 </SplitText>
               </div>
-              <div ref={titleLine2Ref} className="overflow-hidden mt-2">
-                <span className="bg-gradient-to-r from-accent via-yellow-300 to-accent bg-clip-text text-transparent">
-                  <SplitText charClassName="cursor-pointer transition-colors">
-                    Seluruh Jawa & Bali
-                  </SplitText>
-                </span>
+              <div ref={titleLine2Ref} className="mt-2">
+                <SplitText charClassName="cursor-pointer transition-colors bg-gradient-to-r from-accent via-yellow-300 to-accent bg-clip-text text-transparent">
+                  Seluruh Jawa & Bali
+                </SplitText>
               </div>
             </h1>
 
