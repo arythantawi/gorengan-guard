@@ -26,11 +26,22 @@ const getYouTubeId = (url: string): string | null => {
   return null;
 };
 
+// Get YouTube thumbnail URL with fallback for shorts
+const getYouTubeThumbnail = (url: string, customThumbnail: string | null): string => {
+  if (customThumbnail) return customThumbnail;
+  
+  const videoId = getYouTubeId(url);
+  if (!videoId) return '/placeholder.svg';
+  
+  // Use hqdefault as it's more reliable for shorts
+  return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+};
+
 const VideoSection = () => {
   const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true); // Default true to prevent blank
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -118,9 +129,16 @@ const VideoSection = () => {
           >
             <div className="aspect-video bg-muted">
               <img
-                src={featuredVideo.thumbnail_url || `https://img.youtube.com/vi/${getYouTubeId(featuredVideo.youtube_url)}/maxresdefault.jpg`}
+                src={getYouTubeThumbnail(featuredVideo.youtube_url, featuredVideo.thumbnail_url)}
                 alt={featuredVideo.title}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  const videoId = getYouTubeId(featuredVideo.youtube_url);
+                  if (videoId && !target.src.includes('mqdefault')) {
+                    target.src = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+                  }
+                }}
               />
             </div>
             
@@ -160,9 +178,16 @@ const VideoSection = () => {
                 <div className="relative rounded-xl overflow-hidden shadow-lg">
                   <div className="aspect-video bg-muted">
                     <img
-                      src={video.thumbnail_url || `https://img.youtube.com/vi/${getYouTubeId(video.youtube_url)}/maxresdefault.jpg`}
+                      src={getYouTubeThumbnail(video.youtube_url, video.thumbnail_url)}
                       alt={video.title}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        const videoId = getYouTubeId(video.youtube_url);
+                        if (videoId && !target.src.includes('mqdefault')) {
+                          target.src = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+                        }
+                      }}
                     />
                   </div>
                   
