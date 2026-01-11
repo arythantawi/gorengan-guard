@@ -76,99 +76,64 @@ const Hero = () => {
   const [showBadge, setShowBadge] = useState(false);
 
   useEffect(() => {
-    // Small delay to ensure DOM is ready
-    const timer = setTimeout(() => {
-      const ctx = gsap.context(() => {
-        const tl = gsap.timeline({
-          defaults: {
-            ease: 'power4.out'
-          }
-        });
-
-        // Get all characters for animation
-        const line1Chars = titleLine1Ref.current?.querySelectorAll('.hero-char') || [];
-        const line2Chars = titleLine2Ref.current?.querySelectorAll('.hero-char') || [];
-
-        // Only animate if elements exist
-        if (line1Chars.length === 0 && line2Chars.length === 0) {
-          setShowSubtitle(true);
-          setShowBadge(true);
-          return;
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({
+        defaults: {
+          ease: 'power4.out'
         }
+      });
 
-        // Set initial state for characters
-        gsap.set([line1Chars, line2Chars], {
-          opacity: 0,
-          y: 40,
-          rotateX: -45,
-          transformOrigin: 'top center',
-        });
+      // Get all characters for animation
+      const line1Chars = titleLine1Ref.current?.querySelectorAll('.hero-char') || [];
+      const line2Chars = titleLine2Ref.current?.querySelectorAll('.hero-char') || [];
 
-        // Badge animation
-        tl.from(badgeRef.current, {
-          y: -20,
-          opacity: 0,
-          duration: 0.6,
-          ease: 'back.out(1.7)',
-          onComplete: () => setShowBadge(true)
-        })
-        // Line 1 character animation
-        .to(line1Chars, {
-          opacity: 1,
-          y: 0,
-          rotateX: 0,
-          duration: 0.6,
-          stagger: 0.02,
-          ease: 'power3.out'
-        }, '-=0.2')
-        // Line 2 character animation
-        .to(line2Chars, {
-          opacity: 1,
-          y: 0,
-          rotateX: 0,
-          duration: 0.6,
-          stagger: 0.02,
-          ease: 'power3.out',
-          onComplete: () => setShowSubtitle(true)
-        }, '-=0.4')
+      // Show subtitle and badge immediately if no chars found
+      if (line1Chars.length === 0 && line2Chars.length === 0) {
+        setShowSubtitle(true);
+        setShowBadge(true);
+        return;
+      }
+
+      // Badge animation
+      tl.from(badgeRef.current, {
+        y: -20,
+        opacity: 0,
+        duration: 0.6,
+        ease: 'back.out(1.7)',
+        onComplete: () => setShowBadge(true)
+      })
+      // Line 1 character animation
+      .from(line1Chars, {
+        opacity: 0,
+        y: 30,
+        duration: 0.5,
+        stagger: 0.02,
+        ease: 'power3.out'
+      }, '-=0.2')
+      // Line 2 character animation
+      .from(line2Chars, {
+        opacity: 0,
+        y: 30,
+        duration: 0.5,
+        stagger: 0.02,
+        ease: 'power3.out',
+        onComplete: () => setShowSubtitle(true)
+      }, '-=0.3')
       // Stats animation
       .from(statsRef.current?.children || [], {
-        y: 40,
+        y: 30,
         opacity: 0,
-        duration: 0.8,
-        stagger: 0.15,
-      }, '+=0.8')
+        duration: 0.6,
+        stagger: 0.1,
+      }, '-=0.2')
       // Search card animation
       .from(searchRef.current, {
-        y: 60,
+        y: 40,
         opacity: 0,
-        scale: 0.95,
-        duration: 1,
+        scale: 0.98,
+        duration: 0.8,
         ease: 'power3.out'
-      }, '-=0.5');
-
-      // Subtle hover effect on characters
-      line2Chars.forEach((char) => {
-        const element = char as HTMLElement;
-        element.addEventListener('mouseenter', () => {
-          gsap.to(element, {
-            y: -8,
-            scale: 1.2,
-            color: '#fbbf24',
-            duration: 0.3,
-            ease: 'power2.out'
-          });
-        });
-        element.addEventListener('mouseleave', () => {
-          gsap.to(element, {
-            y: 0,
-            scale: 1,
-            color: '',
-            duration: 0.3,
-            ease: 'power2.out'
-          });
-        });
-      });
+      }, '-=0.4');
 
       // Subtle floating animation for background elements
       gsap.to('.hero-blob-1', {
@@ -278,11 +243,9 @@ const Hero = () => {
         });
       }
 
-      }, heroRef);
-      return () => ctx.revert();
-    }, 50);
+    }, heroRef);
 
-    return () => clearTimeout(timer);
+    return () => ctx.revert();
   }, []);
 
   return (
