@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { CalendarClock, Wallet, Smartphone, ArrowRight, MapPin, ChevronDown, X } from 'lucide-react';
+import { CalendarClock, Wallet, Smartphone, ArrowRight, MapPin, ChevronDown, Search, FileText, CreditCard, CheckCircle, MessageCircle } from 'lucide-react';
 import { getRoutePrice } from '@/lib/scheduleData';
 import {
   Dialog,
@@ -91,14 +91,43 @@ const Services = () => {
   const navigate = useNavigate();
   const [showSchedule, setShowSchedule] = useState(false);
   const [showPrice, setShowPrice] = useState(false);
+  const [showBooking, setShowBooking] = useState(false);
   const [openCategory, setOpenCategory] = useState<string | null>('Jawa - Bali');
   const [openPriceCategory, setOpenPriceCategory] = useState<string | null>('Jawa - Bali');
 
   const handleServiceClick = (dialogType: string) => {
     if (dialogType === 'schedule') setShowSchedule(true);
     else if (dialogType === 'price') setShowPrice(true);
-    else if (dialogType === 'booking') navigate('/search');
+    else if (dialogType === 'booking') setShowBooking(true);
   };
+
+  const bookingSteps = [
+    {
+      icon: Search,
+      title: 'Pilih Rute & Jadwal',
+      description: 'Cari rute perjalanan dari kota asal ke kota tujuan, lalu pilih jadwal keberangkatan yang sesuai.',
+    },
+    {
+      icon: FileText,
+      title: 'Isi Data Penumpang',
+      description: 'Lengkapi formulir pemesanan dengan data diri, alamat penjemputan, dan jumlah penumpang.',
+    },
+    {
+      icon: CreditCard,
+      title: 'Lakukan Pembayaran',
+      description: 'Transfer ke rekening yang tersedia, lalu upload bukti pembayaran untuk verifikasi.',
+    },
+    {
+      icon: CheckCircle,
+      title: 'Konfirmasi Booking',
+      description: 'Setelah pembayaran diverifikasi, Anda akan menerima konfirmasi booking via WhatsApp.',
+    },
+    {
+      icon: MessageCircle,
+      title: 'Siap Berangkat',
+      description: 'Driver akan menghubungi Anda sehari sebelum keberangkatan untuk koordinasi penjemputan.',
+    },
+  ];
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('id-ID', {
@@ -354,6 +383,70 @@ const Services = () => {
                 )}
               </div>
             ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Booking Guide Dialog */}
+      <Dialog open={showBooking} onOpenChange={setShowBooking}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-display flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+                <Smartphone className="w-5 h-5 text-white" />
+              </div>
+              Panduan Pemesanan Online
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="flex-1 overflow-y-auto pr-2 mt-4">
+            <div className="space-y-4">
+              {bookingSteps.map((step, index) => (
+                <div
+                  key={index}
+                  className="flex gap-4 p-4 rounded-xl border border-border bg-card hover:bg-secondary/20 transition-colors"
+                >
+                  <div className="flex-shrink-0">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white font-bold relative">
+                      <step.icon className="w-6 h-6" />
+                      <span className="absolute -top-2 -right-2 w-6 h-6 bg-primary text-primary-foreground rounded-full text-xs flex items-center justify-center font-bold">
+                        {index + 1}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-display font-semibold text-foreground mb-1">
+                      {step.title}
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      {step.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200">
+              <p className="text-sm text-emerald-800 font-medium mb-2">
+                💡 Tips Pemesanan:
+              </p>
+              <ul className="text-sm text-emerald-700 space-y-1">
+                <li>• Pesan minimal H-1 sebelum keberangkatan</li>
+                <li>• Pastikan alamat penjemputan jelas dan mudah dijangkau</li>
+                <li>• Simpan nomor kontak admin untuk koordinasi</li>
+              </ul>
+            </div>
+
+            <button
+              onClick={() => {
+                setShowBooking(false);
+                navigate('/search');
+              }}
+              className="w-full mt-6 py-3 px-6 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+            >
+              Mulai Pesan Sekarang
+              <ArrowRight className="w-5 h-5" />
+            </button>
           </div>
         </DialogContent>
       </Dialog>
