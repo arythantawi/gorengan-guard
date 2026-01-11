@@ -7,56 +7,7 @@ import { Typewriter } from '@/hooks/use-typewriter';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Split text into characters for animation
-const SplitText = ({ 
-  children, 
-  className = '',
-  charClassName = ''
-}: { 
-  children: string; 
-  className?: string;
-  charClassName?: string;
-}) => {
-  return (
-    <span className={className}>
-      {children.split('').map((char, index) => (
-        <span 
-          key={index} 
-          className={`hero-char inline-block ${charClassName}`}
-          style={{ 
-            display: char === ' ' ? 'inline' : 'inline-block',
-          }}
-        >
-          {char === ' ' ? '\u00A0' : char}
-        </span>
-      ))}
-    </span>
-  );
-};
-
-// Split text into words for animation
-const SplitWords = ({ 
-  children, 
-  className = '',
-  wordClassName = ''
-}: { 
-  children: string; 
-  className?: string;
-  wordClassName?: string;
-}) => {
-  return (
-    <span className={className}>
-      {children.split(' ').map((word, index) => (
-        <span 
-          key={index} 
-          className={`hero-word inline-block mr-[0.25em] ${wordClassName}`}
-        >
-          {word}
-        </span>
-      ))}
-    </span>
-  );
-};
+// SplitText and SplitWords removed - causing visibility issues with GSAP animations
 
 const Hero = () => {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -86,9 +37,12 @@ const Hero = () => {
       setShowBadge(true);
 
       try {
-        const line1Chars = titleLine1Ref.current?.querySelectorAll('.hero-char') || [];
-        const line2Chars = titleLine2Ref.current?.querySelectorAll('.hero-char') || [];
-        gsap.set([line1Chars, line2Chars], { opacity: 1, y: 0, clearProps: 'transform' });
+        // Ensure title lines are visible
+        gsap.set([titleLine1Ref.current, titleLine2Ref.current], { 
+          opacity: 1, 
+          y: 0, 
+          clearProps: 'transform' 
+        });
       } catch {
         // noop
       }
@@ -109,16 +63,6 @@ const Hero = () => {
           },
         });
 
-        // Get all characters for animation
-        const line1Chars = titleLine1Ref.current?.querySelectorAll('.hero-char') || [];
-        const line2Chars = titleLine2Ref.current?.querySelectorAll('.hero-char') || [];
-
-        // If chars missing (or animation interrupted), force content visible
-        if (line1Chars.length === 0 && line2Chars.length === 0) {
-          ensureVisible();
-          return;
-        }
-
         // Badge animation
         tl.from(badgeRef.current, {
           y: -20,
@@ -127,26 +71,24 @@ const Hero = () => {
           ease: 'back.out(1.7)',
           onComplete: () => setShowBadge(true),
         })
-          // Line 1 character animation
+          // Title line 1 animation
           .from(
-            line1Chars,
+            titleLine1Ref.current,
             {
               opacity: 0,
               y: 30,
-              duration: 0.5,
-              stagger: 0.02,
+              duration: 0.6,
               ease: 'power3.out',
             },
             '-=0.2'
           )
-          // Line 2 character animation
+          // Title line 2 animation
           .from(
-            line2Chars,
+            titleLine2Ref.current,
             {
               opacity: 0,
               y: 30,
-              duration: 0.5,
-              stagger: 0.02,
+              duration: 0.6,
               ease: 'power3.out',
               onComplete: () => setShowSubtitle(true),
             },
@@ -340,17 +282,15 @@ const Hero = () => {
             </div>
 
             {/* Title with split text animation */}
-            <h1 className="font-display text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.1] mb-8">
-              <div ref={titleLine1Ref} className="pb-2">
-                <SplitText charClassName="text-white">
+            <h1 className="font-display text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.15] mb-8">
+              <div ref={titleLine1Ref} className="pb-2 overflow-visible">
+                <span className="text-white inline">
                   Perjalanan Nyaman ke
-                </SplitText>
+                </span>
               </div>
-              <div ref={titleLine2Ref} className="mt-2">
+              <div ref={titleLine2Ref} className="mt-2 overflow-visible">
                 <span className="inline-block cursor-pointer bg-gradient-to-r from-cyan-300 via-white via-50% to-cyan-300 bg-[length:200%_auto] bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(103,232,249,0.5)] hover:animate-shimmer-text transition-all duration-300">
-                  <SplitText charClassName="">
-                    Seluruh Jawa & Bali
-                  </SplitText>
+                  Seluruh Jawa &amp; Bali
                 </span>
               </div>
             </h1>
