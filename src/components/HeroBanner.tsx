@@ -13,6 +13,34 @@ interface Banner {
   button_text: string | null;
 }
 
+// Helper function to convert Google Drive links to direct image URL
+const convertGoogleDriveUrl = (url: string | null): string | null => {
+  if (!url) return url;
+  
+  // Pattern 1: https://drive.google.com/file/d/{FILE_ID}/view...
+  const filePattern = /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/;
+  const fileMatch = url.match(filePattern);
+  if (fileMatch) {
+    return `https://lh3.googleusercontent.com/d/${fileMatch[1]}`;
+  }
+  
+  // Pattern 2: https://drive.google.com/open?id={FILE_ID}
+  const openPattern = /drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/;
+  const openMatch = url.match(openPattern);
+  if (openMatch) {
+    return `https://lh3.googleusercontent.com/d/${openMatch[1]}`;
+  }
+  
+  // Pattern 3: https://drive.google.com/uc?id={FILE_ID}...
+  const ucPattern = /drive\.google\.com\/uc\?.*id=([a-zA-Z0-9_-]+)/;
+  const ucMatch = url.match(ucPattern);
+  if (ucMatch) {
+    return `https://lh3.googleusercontent.com/d/${ucMatch[1]}`;
+  }
+  
+  return url;
+};
+
 const HeroBanner = () => {
   const [banners, setBanners] = useState<Banner[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -97,7 +125,7 @@ const HeroBanner = () => {
           <div 
             className="absolute inset-0 bg-cover bg-center transition-all duration-700"
             style={{ 
-              backgroundImage: currentBanner.image_url ? `url(${currentBanner.image_url})` : undefined,
+              backgroundImage: currentBanner.image_url ? `url(${convertGoogleDriveUrl(currentBanner.image_url)})` : undefined,
               opacity: currentBanner.image_url ? 1 : 0
             }}
           >

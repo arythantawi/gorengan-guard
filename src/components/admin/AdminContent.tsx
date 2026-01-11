@@ -98,6 +98,34 @@ interface Testimonial {
   is_active: boolean;
 }
 
+// Helper function to convert Google Drive links to direct image URL
+const convertGoogleDriveUrl = (url: string): string => {
+  if (!url) return url;
+  
+  // Pattern 1: https://drive.google.com/file/d/{FILE_ID}/view...
+  const filePattern = /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/;
+  const fileMatch = url.match(filePattern);
+  if (fileMatch) {
+    return `https://lh3.googleusercontent.com/d/${fileMatch[1]}`;
+  }
+  
+  // Pattern 2: https://drive.google.com/open?id={FILE_ID}
+  const openPattern = /drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/;
+  const openMatch = url.match(openPattern);
+  if (openMatch) {
+    return `https://lh3.googleusercontent.com/d/${openMatch[1]}`;
+  }
+  
+  // Pattern 3: https://drive.google.com/uc?id={FILE_ID}...
+  const ucPattern = /drive\.google\.com\/uc\?.*id=([a-zA-Z0-9_-]+)/;
+  const ucMatch = url.match(ucPattern);
+  if (ucMatch) {
+    return `https://lh3.googleusercontent.com/d/${ucMatch[1]}`;
+  }
+  
+  return url;
+};
+
 const AdminContent = () => {
   const [activeTab, setActiveTab] = useState('banners');
   
@@ -217,7 +245,7 @@ const AdminContent = () => {
       const data = {
         title: bannerForm.title,
         subtitle: bannerForm.subtitle || null,
-        image_url: bannerForm.image_url || null,
+        image_url: bannerForm.image_url ? convertGoogleDriveUrl(bannerForm.image_url) : null,
         link_url: bannerForm.link_url || null,
         button_text: bannerForm.button_text || null,
         display_order: bannerForm.display_order,
@@ -522,7 +550,7 @@ const AdminContent = () => {
                         {banner.image_url ? (
                           <div className="w-16 h-10 rounded-md overflow-hidden bg-muted border border-border">
                             <img 
-                              src={banner.image_url} 
+                              src={convertGoogleDriveUrl(banner.image_url)} 
                               alt={banner.title}
                               className="w-full h-full object-cover"
                               onError={(e) => {
@@ -824,15 +852,15 @@ const AdminContent = () => {
               <Input 
                 value={bannerForm.image_url} 
                 onChange={(e) => setBannerForm({...bannerForm, image_url: e.target.value})} 
-                placeholder="https://example.com/image.jpg" 
+                placeholder="https://drive.google.com/file/d/.../view atau link gambar langsung" 
               />
               <p className="text-xs text-muted-foreground">
-                Gunakan link langsung ke gambar (berakhiran .jpg, .png, .webp). Bukan link halaman website.
+                ✅ Mendukung link Google Drive atau link langsung ke gambar (.jpg, .png, .webp)
               </p>
               {bannerForm.image_url && (
                 <div className="mt-2 rounded-lg overflow-hidden border border-border bg-muted/50">
                   <img 
-                    src={bannerForm.image_url} 
+                    src={convertGoogleDriveUrl(bannerForm.image_url)} 
                     alt="Preview" 
                     className="w-full h-32 object-cover"
                     onError={(e) => {
@@ -845,7 +873,7 @@ const AdminContent = () => {
                     }}
                   />
                   <div className="hidden p-4 text-center text-sm text-destructive">
-                    ⚠️ Gambar tidak dapat dimuat. Pastikan URL adalah link langsung ke file gambar.
+                    ⚠️ Gambar tidak dapat dimuat. Pastikan file di Google Drive di-share sebagai "Anyone with the link".
                   </div>
                 </div>
               )}
