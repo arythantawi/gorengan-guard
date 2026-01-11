@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -18,21 +18,18 @@ interface Banner {
 const convertGoogleDriveUrl = (url: string | null): string | null => {
   if (!url) return url;
   
-  // Pattern 1: https://drive.google.com/file/d/{FILE_ID}/view...
   const filePattern = /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/;
   const fileMatch = url.match(filePattern);
   if (fileMatch) {
     return `https://lh3.googleusercontent.com/d/${fileMatch[1]}`;
   }
   
-  // Pattern 2: https://drive.google.com/open?id={FILE_ID}
   const openPattern = /drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/;
   const openMatch = url.match(openPattern);
   if (openMatch) {
     return `https://lh3.googleusercontent.com/d/${openMatch[1]}`;
   }
   
-  // Pattern 3: https://drive.google.com/uc?id={FILE_ID}...
   const ucPattern = /drive\.google\.com\/uc\?.*id=([a-zA-Z0-9_-]+)/;
   const ucMatch = url.match(ucPattern);
   if (ucMatch) {
@@ -47,9 +44,13 @@ const HeroBanner = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isTextVisible, setIsTextVisible] = useState(false);
-  const contentRef = useRef<HTMLDivElement>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
+  
   const sectionRef = useRef<HTMLElement>(null);
+  const slidesContainerRef = useRef<HTMLDivElement>(null);
+  const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
   const textOverlayRef = useRef<HTMLDivElement>(null);
+  const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const fetchBanners = async () => {
@@ -68,232 +69,353 @@ const HeroBanner = () => {
     fetchBanners();
   }, []);
 
-  useEffect(() => {
-    if (banners.length <= 1) return;
+  // Animate slide transition with GSAP
+  const animateSlide = useCallback((fromIndex: number, toIndex: number, direction: 'next' | 'prev') => {
+    if (isAnimating || banners.length <= 1) return;
     
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % banners.length);
-    }, 6000);
-
-    return () => clearInterval(interval);
-  }, [banners.length]);
-
-  // Reset text visibility when banner changes
-  useEffect(() => {
+    setIsAnimating(true);
     setIsTextVisible(false);
-  }, [currentIndex]);
-
-  // Animate content on banner change
-  useEffect(() => {
-    if (contentRef.current && banners.length > 0) {
-      gsap.fromTo(contentRef.current,
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }
-      );
-    }
-  }, [currentIndex, banners.length]);
-
-  // Scroll animation
-  useEffect(() => {
-    if (!sectionRef.current || banners.length === 0) return;
     
-    const ctx = gsap.context(() => {
-      gsap.from(sectionRef.current, {
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top 90%',
-        },
-        y: 40,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power3.out'
-      });
+    const currentSlide = slideRefs.current[fromIndex];
+    const nextSlide = slideRefs.current[toIndex];
+    
+    if (!currentSlide || !nextSlide) {
+      setIsAnimating(false);
+      return;
+    }
+
+    const xOffset = direction === 'next' ? '100%' : '-100%';
+    const xOffsetOut = direction === 'next' ? '-100%' : '100%';
+
+    // Set initial state for incoming slide
+    gsap.set(nextSlide, { 
+      xPercent: direction === 'next' ? 100 : -100, 
+      opacity: 1,
+      visibility: 'visible',
+      scale: 1.05
     });
 
-    return () => ctx.revert();
-  }, [banners.length]);
+    // Create timeline for smooth transition
+    const tl = gsap.timeline({
+      onComplete: () => {
+        setCurrentIndex(toIndex);
+        setIsAnimating(false);
+        // Hide previous slide after animation
+        gsap.set(currentSlide, { visibility: 'hidden', opacity: 0 });
+      }
+    });
+
+    // Animate out current slide
+    tl.to(currentSlide, {
+      xPercent: direction === 'next' ? -100 : 100,
+      opacity: 0,
+      scale: 0.95,
+      duration: 0.8,
+      ease: 'power3.inOut'
+    }, 0);
+
+    // Animate in next slide
+    tl.to(nextSlide, {
+      xPercent: 0,
+      opacity: 1,
+      scale: 1,
+      duration: 0.8,
+      ease: 'power3.inOut'
+    }, 0);
+
+    // Animate content elements
+    const nextContent = nextSlide.querySelector('.slide-content');
+    if (nextContent) {
+      tl.fromTo(nextContent.children, 
+        { y: 40, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: 'power3.out' },
+        0.4
+      );
+    }
+  }, [isAnimating, banners.length]);
+
+  // Navigate to next slide
+  const goToNext = useCallback(() => {
+    if (banners.length <= 1 || isAnimating) return;
+    const nextIndex = (currentIndex + 1) % banners.length;
+    animateSlide(currentIndex, nextIndex, 'next');
+  }, [currentIndex, banners.length, isAnimating, animateSlide]);
+
+  // Navigate to previous slide
+  const goToPrevious = useCallback(() => {
+    if (banners.length <= 1 || isAnimating) return;
+    const prevIndex = (currentIndex - 1 + banners.length) % banners.length;
+    animateSlide(currentIndex, prevIndex, 'prev');
+  }, [currentIndex, banners.length, isAnimating, animateSlide]);
+
+  // Navigate to specific slide
+  const goToSlide = useCallback((index: number) => {
+    if (index === currentIndex || isAnimating || banners.length <= 1) return;
+    const direction = index > currentIndex ? 'next' : 'prev';
+    animateSlide(currentIndex, index, direction);
+  }, [currentIndex, isAnimating, banners.length, animateSlide]);
+
+  // Auto-play functionality
+  useEffect(() => {
+    if (banners.length <= 1) return;
+
+    const startAutoPlay = () => {
+      autoPlayRef.current = setInterval(() => {
+        goToNext();
+      }, 6000);
+    };
+
+    startAutoPlay();
+
+    return () => {
+      if (autoPlayRef.current) {
+        clearInterval(autoPlayRef.current);
+      }
+    };
+  }, [banners.length, goToNext]);
+
+  // Reset autoplay on manual navigation
+  const resetAutoPlay = useCallback(() => {
+    if (autoPlayRef.current) {
+      clearInterval(autoPlayRef.current);
+      autoPlayRef.current = setInterval(() => {
+        goToNext();
+      }, 6000);
+    }
+  }, [goToNext]);
+
+  // Initial animation on mount
+  useEffect(() => {
+    if (banners.length > 0 && slideRefs.current[0]) {
+      // Set all slides except first to hidden
+      slideRefs.current.forEach((slide, index) => {
+        if (slide) {
+          if (index === 0) {
+            gsap.set(slide, { 
+              xPercent: 0, 
+              opacity: 1, 
+              visibility: 'visible',
+              scale: 1 
+            });
+            // Animate first slide content
+            const content = slide.querySelector('.slide-content');
+            if (content) {
+              gsap.fromTo(content.children,
+                { y: 50, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.8, stagger: 0.15, ease: 'power3.out', delay: 0.3 }
+              );
+            }
+          } else {
+            gsap.set(slide, { 
+              xPercent: 100, 
+              opacity: 0, 
+              visibility: 'hidden',
+              scale: 1.05 
+            });
+          }
+        }
+      });
+    }
+  }, [banners]);
 
   // Handle banner click to show text with GSAP animation
-  const handleBannerClick = (e: React.MouseEvent) => {
-    // Don't trigger if clicking on navigation or buttons
+  const handleBannerClick = useCallback((e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
     if (target.closest('button') || target.closest('a')) return;
     
+    const currentBanner = banners[currentIndex];
+    if (currentBanner?.layout_type !== 'image_full') return;
+
     if (!isTextVisible && textOverlayRef.current) {
       setIsTextVisible(true);
       
-      const titleEl = textOverlayRef.current.querySelector('.banner-title');
-      const subtitleEl = textOverlayRef.current.querySelector('.banner-subtitle');
-      const buttonEl = textOverlayRef.current.querySelector('.banner-button');
+      const overlay = textOverlayRef.current;
+      const titleEl = overlay.querySelector('.banner-title');
+      const subtitleEl = overlay.querySelector('.banner-subtitle');
+      const buttonEl = overlay.querySelector('.banner-button');
+
+      gsap.set(overlay, { visibility: 'visible' });
       
-      // Animate the overlay container
-      gsap.fromTo(textOverlayRef.current,
+      gsap.fromTo(overlay,
         { opacity: 0 },
-        { opacity: 1, duration: 0.4, ease: 'power2.out' }
+        { opacity: 1, duration: 0.5, ease: 'power2.out' }
       );
       
-      // Animate title from bottom
       if (titleEl) {
         gsap.fromTo(titleEl,
-          { opacity: 0, y: 60 },
-          { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out', delay: 0.1 }
+          { opacity: 0, y: 80, rotateX: -15 },
+          { opacity: 1, y: 0, rotateX: 0, duration: 0.8, ease: 'power3.out', delay: 0.1 }
         );
       }
       
-      // Animate subtitle from bottom with stagger
       if (subtitleEl) {
         gsap.fromTo(subtitleEl,
-          { opacity: 0, y: 40 },
-          { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out', delay: 0.25 }
+          { opacity: 0, y: 50 },
+          { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', delay: 0.25 }
         );
       }
       
-      // Animate button from bottom
       if (buttonEl) {
         gsap.fromTo(buttonEl,
-          { opacity: 0, y: 30, scale: 0.9 },
-          { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: 'back.out(1.7)', delay: 0.4 }
+          { opacity: 0, y: 40, scale: 0.85 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: 'back.out(1.7)', delay: 0.4 }
         );
       }
     } else if (isTextVisible && textOverlayRef.current) {
-      // Hide animation
-      gsap.to(textOverlayRef.current, {
+      const overlay = textOverlayRef.current;
+      
+      gsap.to(overlay, {
         opacity: 0,
-        duration: 0.3,
+        duration: 0.4,
         ease: 'power2.in',
-        onComplete: () => setIsTextVisible(false)
+        onComplete: () => {
+          setIsTextVisible(false);
+          gsap.set(overlay, { visibility: 'hidden' });
+        }
       });
     }
-  };
+  }, [isTextVisible, banners, currentIndex]);
 
   if (isLoading || banners.length === 0) return null;
 
   const currentBanner = banners[currentIndex];
 
-  const goToPrevious = () => {
-    setCurrentIndex((prev) => (prev - 1 + banners.length) % banners.length);
-  };
-
-  const goToNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % banners.length);
-  };
-
-  const layoutType = currentBanner.layout_type || 'image_caption';
-  const hasImage = currentBanner.image_url;
-
-  // Navigation component for reuse
-  const NavigationArrows = ({ isDark = false }: { isDark?: boolean }) => (
+  // Navigation Arrows
+  const NavigationArrows = () => (
     banners.length > 1 ? (
       <>
         <button
-          onClick={goToPrevious}
-          className={`absolute left-3 md:left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-white transition-all duration-300 ${
-            isDark ? 'bg-black/30 hover:bg-black/50' : 'bg-white/10 hover:bg-white/20'
-          } backdrop-blur-sm`}
+          onClick={(e) => { e.stopPropagation(); goToPrevious(); resetAutoPlay(); }}
+          disabled={isAnimating}
+          className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-white bg-black/20 hover:bg-black/40 backdrop-blur-md border border-white/10 transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed group"
         >
-          <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
+          <ChevronLeft className="w-6 h-6 md:w-7 md:h-7 group-hover:-translate-x-0.5 transition-transform" />
         </button>
         <button
-          onClick={goToNext}
-          className={`absolute right-3 md:right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-white transition-all duration-300 ${
-            isDark ? 'bg-black/30 hover:bg-black/50' : 'bg-white/10 hover:bg-white/20'
-          } backdrop-blur-sm`}
+          onClick={(e) => { e.stopPropagation(); goToNext(); resetAutoPlay(); }}
+          disabled={isAnimating}
+          className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-white bg-black/20 hover:bg-black/40 backdrop-blur-md border border-white/10 transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed group"
         >
-          <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
+          <ChevronRight className="w-6 h-6 md:w-7 md:h-7 group-hover:translate-x-0.5 transition-transform" />
         </button>
       </>
     ) : null
   );
 
-  const DotsIndicator = ({ position = 'bottom-4' }: { position?: string }) => (
+  // Dots Indicator
+  const DotsIndicator = ({ position = 'bottom-6' }: { position?: string }) => (
     banners.length > 1 ? (
-      <div className={`absolute ${position} left-1/2 -translate-x-1/2 z-20 flex gap-2`}>
+      <div className={`absolute ${position} left-1/2 -translate-x-1/2 z-30 flex items-center gap-3`}>
         {banners.map((_, index) => (
           <button
             key={index}
-            onClick={() => setCurrentIndex(index)}
-            className={`h-2 rounded-full transition-all duration-300 ${
+            onClick={(e) => { e.stopPropagation(); goToSlide(index); resetAutoPlay(); }}
+            disabled={isAnimating}
+            className={`relative h-3 rounded-full transition-all duration-500 ${
               index === currentIndex 
-                ? 'bg-white w-6 shadow-md' 
-                : 'bg-white/50 w-2 hover:bg-white/70'
+                ? 'bg-white w-10 shadow-lg' 
+                : 'bg-white/40 w-3 hover:bg-white/60 hover:scale-125'
             }`}
-          />
+          >
+            {index === currentIndex && (
+              <span className="absolute inset-0 rounded-full bg-white/50 animate-ping" />
+            )}
+          </button>
         ))}
       </div>
     ) : null
   );
 
-  // Render based on layout type
-  const renderBanner = () => {
-    switch (layoutType) {
-      case 'image_full':
-        // Full image only - click to reveal text
-        return (
+  // Progress Bar
+  const ProgressBar = () => (
+    banners.length > 1 ? (
+      <div className="absolute top-0 left-0 right-0 z-30 h-1 bg-white/20">
+        <div 
+          className="h-full bg-gradient-to-r from-white via-white to-white/80 transition-all duration-300"
+          style={{ 
+            width: `${((currentIndex + 1) / banners.length) * 100}%`
+          }}
+        />
+      </div>
+    ) : null
+  );
+
+  // Render individual slide
+  const renderSlide = (banner: Banner, index: number) => {
+    const layoutType = banner.layout_type || 'image_caption';
+    const hasImage = banner.image_url;
+    const isActive = index === currentIndex;
+
+    return (
+      <div
+        key={banner.id}
+        ref={(el) => slideRefs.current[index] = el}
+        className="absolute inset-0 w-full h-full"
+        style={{ willChange: 'transform, opacity' }}
+      >
+        {layoutType === 'image_full' ? (
           <div 
-            className="relative cursor-pointer select-none" 
-            onClick={handleBannerClick}
+            className="relative w-full h-full cursor-pointer"
+            onClick={isActive ? handleBannerClick : undefined}
           >
-            <div className="relative w-full aspect-[16/9] md:aspect-[21/9] pointer-events-none">
+            <div className="absolute inset-0">
               {hasImage ? (
                 <img 
-                  src={convertGoogleDriveUrl(currentBanner.image_url)!}
-                  alt={currentBanner.title}
-                  className="w-full h-full object-cover transition-all duration-700"
+                  src={convertGoogleDriveUrl(banner.image_url)!}
+                  alt={banner.title}
+                  className="w-full h-full object-cover"
                   draggable={false}
                 />
               ) : (
                 <div className="w-full h-full bg-gradient-to-br from-primary to-primary/80" />
               )}
+              {/* Gradient overlay for depth */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/10" />
             </div>
             
-            {/* Click-to-reveal text overlay */}
-            <div 
-              ref={textOverlayRef}
-              className={`absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex flex-col items-center justify-end pb-12 md:pb-16 px-4 pointer-events-none ${
-                isTextVisible ? 'opacity-100' : 'opacity-0'
-              }`}
-              style={{ visibility: isTextVisible ? 'visible' : 'hidden' }}
-            >
-              <h2 className="banner-title text-2xl md:text-5xl font-bold text-white mb-3 max-w-3xl leading-tight drop-shadow-lg text-center">
-                {currentBanner.title}
-              </h2>
-              {currentBanner.subtitle && (
-                <p className="banner-subtitle text-base md:text-xl text-white/90 mb-6 max-w-2xl leading-relaxed drop-shadow text-center">
-                  {currentBanner.subtitle}
-                </p>
-              )}
-              {currentBanner.link_url && currentBanner.button_text && (
-                <Button
-                  asChild
-                  size="lg"
-                  className="banner-button bg-white text-primary hover:bg-white/90 px-8 py-5 text-base rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 pointer-events-auto"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <a href={currentBanner.link_url}>{currentBanner.button_text}</a>
-                </Button>
-              )}
-            </div>
-            
-            {/* Hint to click */}
-            {!isTextVisible && (currentBanner.title || currentBanner.subtitle) && (
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 bg-black/50 backdrop-blur-sm text-white text-xs md:text-sm px-4 py-2 rounded-full animate-pulse pointer-events-none">
-                Klik untuk lihat detail
+            {/* Text overlay for image_full */}
+            {isActive && (
+              <div 
+                ref={textOverlayRef}
+                className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex flex-col items-center justify-end pb-16 md:pb-20 px-6"
+                style={{ visibility: isTextVisible ? 'visible' : 'hidden', opacity: isTextVisible ? 1 : 0 }}
+              >
+                <div className="slide-content text-center">
+                  <h2 className="banner-title text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-4 max-w-4xl leading-tight drop-shadow-2xl">
+                    {banner.title}
+                  </h2>
+                  {banner.subtitle && (
+                    <p className="banner-subtitle text-lg md:text-xl lg:text-2xl text-white/90 mb-8 max-w-2xl leading-relaxed drop-shadow-lg">
+                      {banner.subtitle}
+                    </p>
+                  )}
+                  {banner.link_url && banner.button_text && (
+                    <Button
+                      asChild
+                      size="lg"
+                      className="banner-button bg-white text-primary hover:bg-white/90 px-10 py-6 text-lg rounded-2xl shadow-2xl hover:shadow-white/20 transition-all duration-300 hover:-translate-y-1"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <a href={banner.link_url}>{banner.button_text}</a>
+                    </Button>
+                  )}
+                </div>
               </div>
             )}
             
-            <NavigationArrows isDark={true} />
-            <DotsIndicator position="bottom-4" />
+            {/* Click hint */}
+            {isActive && !isTextVisible && (banner.title || banner.subtitle) && (
+              <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 bg-black/40 backdrop-blur-md text-white text-sm md:text-base px-6 py-3 rounded-full border border-white/10 shadow-lg">
+                <span className="animate-pulse">Klik untuk lihat detail</span>
+              </div>
+            )}
           </div>
-        );
-
-      case 'image_overlay':
-        // Image with text overlay on top
-        return (
-          <div className="relative min-h-[280px] md:min-h-[380px]">
+        ) : layoutType === 'image_overlay' ? (
+          <div className="relative w-full h-full">
             {hasImage && (
               <div 
-                className="absolute inset-0 bg-cover bg-center transition-all duration-700"
-                style={{ backgroundImage: `url(${convertGoogleDriveUrl(currentBanner.image_url)})` }}
+                className="absolute inset-0 bg-cover bg-center"
+                style={{ backgroundImage: `url(${convertGoogleDriveUrl(banner.image_url)})` }}
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30" />
               </div>
@@ -301,146 +423,134 @@ const HeroBanner = () => {
             {!hasImage && (
               <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-primary/80" />
             )}
-            <div 
-              ref={contentRef}
-              className="relative z-10 flex flex-col items-center justify-center text-center p-6 md:p-12 min-h-[280px] md:min-h-[380px]"
-            >
-              <h2 className="text-2xl md:text-5xl font-bold text-white mb-3 max-w-3xl leading-tight drop-shadow-lg">
-                {currentBanner.title}
+            <div className="slide-content relative z-10 flex flex-col items-center justify-center text-center h-full p-8 md:p-16">
+              <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-4 max-w-4xl leading-tight drop-shadow-2xl">
+                {banner.title}
               </h2>
-              {currentBanner.subtitle && (
-                <p className="text-base md:text-xl text-white/90 mb-6 max-w-2xl leading-relaxed drop-shadow">
-                  {currentBanner.subtitle}
+              {banner.subtitle && (
+                <p className="text-lg md:text-xl lg:text-2xl text-white/90 mb-8 max-w-2xl leading-relaxed drop-shadow-lg">
+                  {banner.subtitle}
                 </p>
               )}
-              {currentBanner.link_url && currentBanner.button_text && (
+              {banner.link_url && banner.button_text && (
                 <Button
                   asChild
                   size="lg"
-                  className="bg-white text-primary hover:bg-white/90 px-8 py-5 text-base rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                  className="bg-white text-primary hover:bg-white/90 px-10 py-6 text-lg rounded-2xl shadow-2xl hover:shadow-white/20 transition-all duration-300 hover:-translate-y-1"
                 >
-                  <a href={currentBanner.link_url}>{currentBanner.button_text}</a>
+                  <a href={banner.link_url}>{banner.button_text}</a>
                 </Button>
               )}
             </div>
-            <NavigationArrows isDark={hasImage ? true : false} />
-            <DotsIndicator position="bottom-6" />
           </div>
-        );
-
-      case 'image_caption':
-        // Image with caption bar below
-        return (
-          <div className="relative">
+        ) : layoutType === 'image_caption' ? (
+          <div className="relative w-full h-full flex flex-col">
             {hasImage ? (
               <>
-                <div className="relative w-full aspect-[16/9] md:aspect-[21/9]">
+                <div className="flex-1 relative overflow-hidden">
                   <img 
-                    src={convertGoogleDriveUrl(currentBanner.image_url)!}
-                    alt={currentBanner.title}
-                    className="w-full h-full object-cover transition-all duration-700"
+                    src={convertGoogleDriveUrl(banner.image_url)!}
+                    alt={banner.title}
+                    className="w-full h-full object-cover"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                 </div>
-                <div 
-                  ref={contentRef}
-                  className="bg-gradient-to-r from-primary to-primary/90 px-4 py-4 md:px-8 md:py-5"
-                >
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-6">
+                <div className="slide-content bg-gradient-to-r from-primary via-primary to-primary/90 px-6 py-5 md:px-10 md:py-6">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div className="flex-1 min-w-0">
-                      <h2 className="text-lg md:text-2xl font-bold text-white truncate">
-                        {currentBanner.title}
+                      <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-white truncate">
+                        {banner.title}
                       </h2>
-                      {currentBanner.subtitle && (
-                        <p className="text-sm md:text-base text-white/80 mt-1 line-clamp-1">
-                          {currentBanner.subtitle}
+                      {banner.subtitle && (
+                        <p className="text-base md:text-lg text-white/80 mt-1 line-clamp-1">
+                          {banner.subtitle}
                         </p>
                       )}
                     </div>
-                    {currentBanner.link_url && currentBanner.button_text && (
+                    {banner.link_url && banner.button_text && (
                       <Button
                         asChild
-                        size="sm"
-                        className="bg-white text-primary hover:bg-white/90 px-6 py-2 text-sm font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 shrink-0 w-fit"
+                        size="default"
+                        className="bg-white text-primary hover:bg-white/90 px-8 py-3 text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 shrink-0 w-fit"
                       >
-                        <a href={currentBanner.link_url}>{currentBanner.button_text}</a>
+                        <a href={banner.link_url}>{banner.button_text}</a>
                       </Button>
                     )}
                   </div>
                 </div>
-                <NavigationArrows isDark={true} />
-                <DotsIndicator position="bottom-16 md:bottom-20" />
               </>
             ) : (
-              // Fallback to text only if no image
-              <div className="bg-gradient-to-br from-primary via-primary to-primary/80 min-h-[200px] md:min-h-[280px]">
-                <div 
-                  ref={contentRef} 
-                  className="flex flex-col items-center justify-center text-center p-6 md:p-10 min-h-[200px] md:min-h-[280px]"
-                >
-                  <h2 className="text-2xl md:text-4xl font-bold text-white mb-3 max-w-3xl leading-tight">
-                    {currentBanner.title}
-                  </h2>
-                  {currentBanner.subtitle && (
-                    <p className="text-base md:text-lg text-white/80 mb-6 max-w-2xl leading-relaxed">
-                      {currentBanner.subtitle}
-                    </p>
-                  )}
-                  {currentBanner.link_url && currentBanner.button_text && (
-                    <Button
-                      asChild
-                      size="lg"
-                      className="bg-white text-primary hover:bg-white/90 px-8 py-5 text-base rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-                    >
-                      <a href={currentBanner.link_url}>{currentBanner.button_text}</a>
-                    </Button>
-                  )}
-                </div>
-                <NavigationArrows />
-                <DotsIndicator />
+              <div className="slide-content flex-1 bg-gradient-to-br from-primary via-primary to-primary/80 flex flex-col items-center justify-center text-center p-8 md:p-12">
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 max-w-3xl leading-tight">
+                  {banner.title}
+                </h2>
+                {banner.subtitle && (
+                  <p className="text-lg md:text-xl text-white/80 mb-8 max-w-2xl leading-relaxed">
+                    {banner.subtitle}
+                  </p>
+                )}
+                {banner.link_url && banner.button_text && (
+                  <Button
+                    asChild
+                    size="lg"
+                    className="bg-white text-primary hover:bg-white/90 px-10 py-6 text-lg rounded-2xl shadow-2xl transition-all duration-300 hover:-translate-y-1"
+                  >
+                    <a href={banner.link_url}>{banner.button_text}</a>
+                  </Button>
+                )}
               </div>
             )}
           </div>
-        );
-
-      case 'text_only':
-      default:
-        // Text only - no image
-        return (
-          <div className="bg-gradient-to-br from-primary via-primary to-primary/80 min-h-[200px] md:min-h-[280px] relative">
-            <div 
-              ref={contentRef} 
-              className="flex flex-col items-center justify-center text-center p-6 md:p-10 min-h-[200px] md:min-h-[280px]"
-            >
-              <h2 className="text-2xl md:text-4xl font-bold text-white mb-3 max-w-3xl leading-tight">
-                {currentBanner.title}
-              </h2>
-              {currentBanner.subtitle && (
-                <p className="text-base md:text-lg text-white/80 mb-6 max-w-2xl leading-relaxed">
-                  {currentBanner.subtitle}
-                </p>
-              )}
-              {currentBanner.link_url && currentBanner.button_text && (
-                <Button
-                  asChild
-                  size="lg"
-                  className="bg-white text-primary hover:bg-white/90 px-8 py-5 text-base rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-                >
-                  <a href={currentBanner.link_url}>{currentBanner.button_text}</a>
-                </Button>
-              )}
-            </div>
-            <NavigationArrows />
-            <DotsIndicator />
+        ) : (
+          // text_only
+          <div className="slide-content w-full h-full bg-gradient-to-br from-primary via-primary to-primary/80 flex flex-col items-center justify-center text-center p-8 md:p-12">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 max-w-3xl leading-tight">
+              {banner.title}
+            </h2>
+            {banner.subtitle && (
+              <p className="text-lg md:text-xl text-white/80 mb-8 max-w-2xl leading-relaxed">
+                {banner.subtitle}
+              </p>
+            )}
+            {banner.link_url && banner.button_text && (
+              <Button
+                asChild
+                size="lg"
+                className="bg-white text-primary hover:bg-white/90 px-10 py-6 text-lg rounded-2xl shadow-2xl transition-all duration-300 hover:-translate-y-1"
+              >
+                <a href={banner.link_url}>{banner.button_text}</a>
+              </Button>
+            )}
           </div>
-        );
-    }
+        )}
+      </div>
+    );
   };
 
   return (
     <section ref={sectionRef} className="py-8 md:py-12 bg-background">
       <div className="container">
-        <div className="relative rounded-2xl md:rounded-3xl overflow-hidden shadow-xl">
-          {renderBanner()}
+        <div className="relative rounded-3xl overflow-hidden shadow-2xl">
+          <ProgressBar />
+          
+          {/* Slides container */}
+          <div 
+            ref={slidesContainerRef}
+            className="relative w-full aspect-[16/9] md:aspect-[21/9] overflow-hidden"
+          >
+            {banners.map((banner, index) => renderSlide(banner, index))}
+          </div>
+          
+          <NavigationArrows />
+          <DotsIndicator position="bottom-6" />
+          
+          {/* Banner counter */}
+          {banners.length > 1 && (
+            <div className="absolute top-4 right-4 z-30 bg-black/30 backdrop-blur-md text-white text-sm px-4 py-2 rounded-full border border-white/10">
+              <span className="font-semibold">{currentIndex + 1}</span>
+              <span className="text-white/60"> / {banners.length}</span>
+            </div>
+          )}
         </div>
       </div>
     </section>
