@@ -11,6 +11,7 @@ import {
   Star,
   MessageSquare
 } from 'lucide-react';
+import BannerPreview from './BannerPreview';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -836,90 +837,85 @@ const AdminContent = () => {
 
       {/* Banner Dialog */}
       <Dialog open={bannerDialogOpen} onOpenChange={setBannerDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingBanner ? 'Edit Banner' : 'Tambah Banner'}</DialogTitle>
             <DialogDescription>Kelola banner untuk tampilan website</DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="space-y-2">
-              <Label>Tipe Layout *</Label>
-              <Select 
-                value={bannerForm.layout_type} 
-                onValueChange={(value) => setBannerForm({...bannerForm, layout_type: value})}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih tipe layout" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="image_full">🖼️ Gambar Penuh (tanpa teks)</SelectItem>
-                  <SelectItem value="image_overlay">🎨 Gambar + Overlay Teks</SelectItem>
-                  <SelectItem value="image_caption">📝 Gambar + Caption Bawah</SelectItem>
-                  <SelectItem value="text_only">✏️ Teks Saja (tanpa gambar)</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground">
-                Pilih bagaimana banner akan ditampilkan di website
-              </p>
-            </div>
-            <div className="space-y-2">
-              <Label>Judul *</Label>
-              <Input value={bannerForm.title} onChange={(e) => setBannerForm({...bannerForm, title: e.target.value})} />
-            </div>
-            <div className="space-y-2">
-              <Label>Subtitle</Label>
-              <Input value={bannerForm.subtitle} onChange={(e) => setBannerForm({...bannerForm, subtitle: e.target.value})} />
-            </div>
-            <div className="space-y-2">
-              <Label>URL Gambar</Label>
-              <Input 
-                value={bannerForm.image_url} 
-                onChange={(e) => setBannerForm({...bannerForm, image_url: e.target.value})} 
-                placeholder="https://drive.google.com/file/d/.../view atau link gambar langsung" 
-              />
-              <p className="text-xs text-muted-foreground">
-                ✅ Mendukung link Google Drive atau link langsung ke gambar (.jpg, .png, .webp)
-              </p>
-              {bannerForm.image_url && (
-                <div className="mt-2 rounded-lg overflow-hidden border border-border bg-muted/50">
-                  <img 
-                    src={convertGoogleDriveUrl(bannerForm.image_url)} 
-                    alt="Preview" 
-                    className="w-full h-32 object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                      (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
-                    }}
-                    onLoad={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'block';
-                      (e.target as HTMLImageElement).nextElementSibling?.classList.add('hidden');
-                    }}
-                  />
-                  <div className="hidden p-4 text-center text-sm text-destructive">
-                    ⚠️ Gambar tidak dapat dimuat. Pastikan file di Google Drive di-share sebagai "Anyone with the link".
-                  </div>
+          <div className="grid md:grid-cols-2 gap-6 py-4">
+            {/* Form Fields */}
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Tipe Layout *</Label>
+                <Select 
+                  value={bannerForm.layout_type} 
+                  onValueChange={(value) => setBannerForm({...bannerForm, layout_type: value})}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih tipe layout" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="image_full">🖼️ Gambar Penuh (tanpa teks)</SelectItem>
+                    <SelectItem value="image_overlay">🎨 Gambar + Overlay Teks</SelectItem>
+                    <SelectItem value="image_caption">📝 Gambar + Caption Bawah</SelectItem>
+                    <SelectItem value="text_only">✏️ Teks Saja (tanpa gambar)</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  Pilih bagaimana banner akan ditampilkan di website
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Label>Judul *</Label>
+                <Input value={bannerForm.title} onChange={(e) => setBannerForm({...bannerForm, title: e.target.value})} />
+              </div>
+              <div className="space-y-2">
+                <Label>Subtitle</Label>
+                <Input value={bannerForm.subtitle} onChange={(e) => setBannerForm({...bannerForm, subtitle: e.target.value})} />
+              </div>
+              <div className="space-y-2">
+                <Label>URL Gambar</Label>
+                <Input 
+                  value={bannerForm.image_url} 
+                  onChange={(e) => setBannerForm({...bannerForm, image_url: e.target.value})} 
+                  placeholder="https://drive.google.com/file/d/.../view" 
+                />
+                <p className="text-xs text-muted-foreground">
+                  ✅ Mendukung link Google Drive atau link langsung
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>URL Link</Label>
+                  <Input value={bannerForm.link_url} onChange={(e) => setBannerForm({...bannerForm, link_url: e.target.value})} />
                 </div>
-              )}
+                <div className="space-y-2">
+                  <Label>Teks Tombol</Label>
+                  <Input value={bannerForm.button_text} onChange={(e) => setBannerForm({...bannerForm, button_text: e.target.value})} />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Urutan</Label>
+                  <Input type="number" value={bannerForm.display_order} onChange={(e) => setBannerForm({...bannerForm, display_order: parseInt(e.target.value) || 0})} />
+                </div>
+                <div className="flex items-center justify-between pt-6">
+                  <Label>Aktif</Label>
+                  <Switch checked={bannerForm.is_active} onCheckedChange={(checked) => setBannerForm({...bannerForm, is_active: checked})} />
+                </div>
+              </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>URL Link</Label>
-                <Input value={bannerForm.link_url} onChange={(e) => setBannerForm({...bannerForm, link_url: e.target.value})} />
-              </div>
-              <div className="space-y-2">
-                <Label>Teks Tombol</Label>
-                <Input value={bannerForm.button_text} onChange={(e) => setBannerForm({...bannerForm, button_text: e.target.value})} />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Urutan</Label>
-                <Input type="number" value={bannerForm.display_order} onChange={(e) => setBannerForm({...bannerForm, display_order: parseInt(e.target.value) || 0})} />
-              </div>
-              <div className="flex items-center justify-between pt-6">
-                <Label>Aktif</Label>
-                <Switch checked={bannerForm.is_active} onCheckedChange={(checked) => setBannerForm({...bannerForm, is_active: checked})} />
-              </div>
+            
+            {/* Live Preview */}
+            <div className="space-y-4">
+              <BannerPreview
+                title={bannerForm.title}
+                subtitle={bannerForm.subtitle}
+                image_url={bannerForm.image_url}
+                link_url={bannerForm.link_url}
+                button_text={bannerForm.button_text}
+                layout_type={bannerForm.layout_type}
+              />
             </div>
           </div>
           <DialogFooter>
