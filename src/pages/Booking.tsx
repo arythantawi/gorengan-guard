@@ -424,7 +424,7 @@ const Booking = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.name || !formData.phone || !formData.pickupAddress) {
       toast.error('Mohon lengkapi data yang diperlukan');
       return;
@@ -437,35 +437,37 @@ const Booking = () => {
 
     setIsSubmitting(true);
 
+    // Generate order_id on client so we don't need SELECT/RETURNING (blocked by RLS for anon)
+    const newOrderId = `TRV-${Date.now()}`;
+
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('bookings')
-        .insert([{
-          customer_name: formData.name,
-          customer_phone: formData.phone,
-          customer_email: formData.email || null,
-          pickup_address: formData.pickupAddress,
-          dropoff_address: formData.dropoffAddress || null,
-          notes: formData.notes || null,
-          route_from: from,
-          route_to: to,
-          route_via: via || null,
-          pickup_time: pickupTime,
-          travel_date: travelDate,
-          passengers: passengers,
-          total_price: totalPrice,
-          payment_status: 'pending',
-          order_id: `TRV-${Date.now()}`,
-        }])
-        .select('order_id')
-        .single();
+        .insert([
+          {
+            customer_name: formData.name,
+            customer_phone: formData.phone,
+            customer_email: formData.email || null,
+            pickup_address: formData.pickupAddress,
+            dropoff_address: formData.dropoffAddress || null,
+            notes: formData.notes || null,
+            route_from: from,
+            route_to: to,
+            route_via: via || null,
+            pickup_time: pickupTime,
+            travel_date: travelDate,
+            passengers: passengers,
+            total_price: totalPrice,
+            payment_status: 'pending',
+            order_id: newOrderId,
+          },
+        ]);
 
       if (error) throw error;
 
-      setOrderId(data.order_id);
+      setOrderId(newOrderId);
       setCurrentStep('payment');
       toast.success('Pemesanan berhasil dibuat!');
-
     } catch (error) {
       console.error('Error creating booking:', error);
       toast.error('Gagal membuat pemesanan. Silakan coba lagi.');
