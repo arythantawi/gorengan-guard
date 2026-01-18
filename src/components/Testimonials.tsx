@@ -149,16 +149,16 @@ const Testimonials = () => {
   const averageRating = testimonials.reduce((sum, t) => sum + t.rating, 0) / testimonials.length;
 
   return (
-    <section ref={sectionRef} className="py-20 bg-gradient-to-b from-background to-muted/30">
-      <div className="container">
-        <div className="testimonial-title text-center mb-14">
-          <span className="inline-block px-5 py-2 bg-primary/10 text-primary rounded-full text-sm font-semibold mb-4">
+    <section ref={sectionRef} className="py-12 md:py-20 bg-gradient-to-b from-background to-muted/30">
+      <div className="container px-4 sm:px-6">
+        <div className="testimonial-title text-center mb-10 md:mb-14">
+          <span className="inline-block px-4 md:px-5 py-1.5 md:py-2 bg-primary/10 text-primary rounded-full text-xs md:text-sm font-semibold mb-3 md:mb-4">
             Testimoni Pelanggan
           </span>
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
+          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3 md:mb-4">
             Apa Kata Mereka?
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto min-h-[2rem]">
+          <p className="text-muted-foreground max-w-2xl mx-auto min-h-[2rem] text-sm md:text-base">
             {showDescription && (
               <Typewriter
                 text="Kepuasan pelanggan adalah prioritas utama kami"
@@ -169,52 +169,52 @@ const Testimonials = () => {
           </p>
         </div>
 
-        <div className="testimonial-stats flex flex-wrap justify-center gap-8 md:gap-16 mb-14">
+        <div className="testimonial-stats flex flex-wrap justify-center gap-6 md:gap-8 lg:gap-16 mb-10 md:mb-14">
           <div className="text-center">
-            <div className="text-4xl md:text-5xl font-bold text-primary mb-2">
+            <div className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary mb-1 md:mb-2">
               {averageRating.toFixed(1)}
             </div>
-            <div className="flex items-center justify-center gap-1 mb-1">
+            <div className="flex items-center justify-center gap-0.5 md:gap-1 mb-1">
               {renderStars(Math.round(averageRating))}
             </div>
-            <p className="text-sm text-muted-foreground">Rating Rata-rata</p>
+            <p className="text-xs md:text-sm text-muted-foreground">Rating Rata-rata</p>
           </div>
           <div className="text-center">
-            <div className="text-4xl md:text-5xl font-bold text-primary mb-2">
+            <div className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary mb-1 md:mb-2">
               {testimonials.length}+
             </div>
-            <p className="text-sm text-muted-foreground mt-4">Ulasan Pelanggan</p>
+            <p className="text-xs md:text-sm text-muted-foreground mt-3 md:mt-4">Ulasan Pelanggan</p>
           </div>
           <div className="text-center">
-            <div className="text-4xl md:text-5xl font-bold text-primary mb-2">
+            <div className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary mb-1 md:mb-2">
               98%
             </div>
-            <p className="text-sm text-muted-foreground mt-4">Pelanggan Puas</p>
+            <p className="text-xs md:text-sm text-muted-foreground mt-3 md:mt-4">Pelanggan Puas</p>
           </div>
         </div>
 
         <div className="max-w-4xl mx-auto">
           <div 
             ref={cardRef}
-            className="testimonial-card relative bg-card rounded-3xl p-8 md:p-12 border border-border/50 shadow-xl"
+            className="testimonial-card relative bg-card rounded-2xl md:rounded-3xl p-6 md:p-8 lg:p-12 border border-border/50 shadow-xl"
           >
-            <div className="absolute -top-6 left-8 md:left-12">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg">
-                <Quote className="w-6 h-6 text-primary-foreground" />
+            <div className="absolute -top-4 md:-top-6 left-6 md:left-8 lg:left-12">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg">
+                <Quote className="w-5 h-5 md:w-6 md:h-6 text-primary-foreground" />
               </div>
             </div>
 
-            <div className="flex items-center gap-1 mb-6 pt-4">
+            <div className="flex items-center gap-0.5 md:gap-1 mb-4 md:mb-6 pt-2 md:pt-4">
               {renderStars(currentTestimonial.rating)}
             </div>
 
-            <blockquote className="text-lg md:text-xl text-foreground leading-relaxed mb-8 font-medium">
+            <blockquote className="text-base md:text-lg lg:text-xl text-foreground leading-relaxed mb-6 md:mb-8 font-medium">
               "{currentTestimonial.testimonial_text}"
             </blockquote>
 
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3 md:gap-4">
+                <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-2xl overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center flex-shrink-0">
                   {currentTestimonial.customer_photo_url ? (
                     <img 
                       src={currentTestimonial.customer_photo_url} 
@@ -222,15 +222,15 @@ const Testimonials = () => {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <User className="w-7 h-7 text-primary" />
+                    <User className="w-6 h-6 md:w-7 md:h-7 text-primary" />
                   )}
                 </div>
                 <div>
-                  <h4 className="font-bold text-foreground">
+                  <h4 className="font-bold text-foreground text-sm md:text-base">
                     {currentTestimonial.customer_name}
                   </h4>
                   {currentTestimonial.customer_location && (
-                    <p className="text-sm text-muted-foreground flex items-center gap-1">
+                    <p className="text-xs md:text-sm text-muted-foreground flex items-center gap-1">
                       <MapPin className="w-3 h-3" />
                       {currentTestimonial.customer_location}
                     </p>
@@ -239,19 +239,19 @@ const Testimonials = () => {
               </div>
 
               {currentTestimonial.route_taken && (
-                <div className="px-4 py-2 bg-primary/10 text-primary text-sm font-medium rounded-full">
+                <div className="px-3 md:px-4 py-1.5 md:py-2 bg-primary/10 text-primary text-xs md:text-sm font-medium rounded-full self-start sm:self-auto">
                   {currentTestimonial.route_taken}
                 </div>
               )}
             </div>
           </div>
 
-          <div className="testimonial-nav flex items-center justify-center gap-4 mt-8">
+          <div className="testimonial-nav flex items-center justify-center gap-3 md:gap-4 mt-6 md:mt-8">
             <button
               onClick={goToPrevious}
-              className="w-12 h-12 rounded-xl bg-card border border-border flex items-center justify-center hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300 shadow-md"
+              className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-card border border-border flex items-center justify-center hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300 shadow-md"
             >
-              <ChevronLeft className="w-5 h-5" />
+              <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
             </button>
 
             <div className="flex gap-2">
@@ -270,9 +270,9 @@ const Testimonials = () => {
 
             <button
               onClick={goToNext}
-              className="w-12 h-12 rounded-xl bg-card border border-border flex items-center justify-center hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300 shadow-md"
+              className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-card border border-border flex items-center justify-center hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300 shadow-md"
             >
-              <ChevronRight className="w-5 h-5" />
+              <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
             </button>
           </div>
         </div>

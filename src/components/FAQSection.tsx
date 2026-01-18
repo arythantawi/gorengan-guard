@@ -123,17 +123,17 @@ const FAQSection = forwardRef<HTMLElement>((_, ref) => {
   }, {} as Record<string, FAQ[]>);
 
   return (
-    <section ref={ref || sectionRef} id="faq" className="py-20 bg-muted/20">
-      <div className="container">
-        <div className="faq-title text-center mb-14">
-          <div className="inline-flex items-center gap-2 bg-primary/10 px-5 py-2.5 rounded-full mb-4">
-            <HelpCircle className="w-5 h-5 text-primary" />
-            <span className="text-sm font-semibold text-primary">FAQ</span>
+    <section ref={ref || sectionRef} id="faq" className="py-12 md:py-20 bg-muted/20">
+      <div className="container px-4 sm:px-6">
+        <div className="faq-title text-center mb-10 md:mb-14">
+          <div className="inline-flex items-center gap-1.5 md:gap-2 bg-primary/10 px-4 md:px-5 py-2 md:py-2.5 rounded-full mb-3 md:mb-4">
+            <HelpCircle className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+            <span className="text-xs md:text-sm font-semibold text-primary">FAQ</span>
           </div>
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
+          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3 md:mb-4">
             Pertanyaan yang Sering Diajukan
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto min-h-[2rem]">
+          <p className="text-muted-foreground max-w-2xl mx-auto min-h-[2rem] text-sm md:text-base">
             {showDescription && (
               <Typewriter
                 text="Temukan jawaban untuk pertanyaan umum tentang layanan travel kami"
@@ -144,7 +144,7 @@ const FAQSection = forwardRef<HTMLElement>((_, ref) => {
           </p>
         </div>
 
-        <div className="faq-content max-w-3xl mx-auto mb-12">
+        <div className="faq-content max-w-3xl mx-auto mb-8 md:mb-12">
           {Object.entries(groupedFaqs).map(([category, categoryFaqs]) => (
             <div key={category} className="mb-8">
               {Object.keys(groupedFaqs).length > 1 && (
@@ -153,19 +153,19 @@ const FAQSection = forwardRef<HTMLElement>((_, ref) => {
                   {category}
                 </h3>
               )}
-              <Accordion type="single" collapsible className="space-y-3">
+              <Accordion type="single" collapsible className="space-y-2 md:space-y-3">
                 {categoryFaqs.map((faq) => (
                   <AccordionItem
                     key={faq.id}
                     value={faq.id}
-                    className="bg-card rounded-xl border border-border px-6 data-[state=open]:shadow-lg data-[state=open]:border-primary/20 transition-all duration-300"
+                    className="bg-card rounded-lg md:rounded-xl border border-border px-4 md:px-6 data-[state=open]:shadow-lg data-[state=open]:border-primary/20 transition-all duration-300"
                   >
-                    <AccordionTrigger className="text-left hover:no-underline py-5 [&[data-state=open]>svg]:rotate-180">
-                      <span className="font-semibold text-foreground pr-4 text-base">
+                    <AccordionTrigger className="text-left hover:no-underline py-4 md:py-5 [&[data-state=open]>svg]:rotate-180">
+                      <span className="font-semibold text-foreground pr-4 text-sm md:text-base">
                         {faq.question}
                       </span>
                     </AccordionTrigger>
-                    <AccordionContent className="pb-5 text-muted-foreground leading-relaxed">
+                    <AccordionContent className="pb-4 md:pb-5 text-muted-foreground leading-relaxed text-sm md:text-base">
                       {faq.answer}
                     </AccordionContent>
                   </AccordionItem>
@@ -177,15 +177,15 @@ const FAQSection = forwardRef<HTMLElement>((_, ref) => {
 
         {/* CTA Section */}
         <div className="faq-cta text-center">
-          <div className="inline-flex flex-col items-center p-8 bg-card rounded-2xl border border-border shadow-lg">
-            <p className="text-foreground font-medium mb-4">
+          <div className="inline-flex flex-col items-center p-6 md:p-8 bg-card rounded-xl md:rounded-2xl border border-border shadow-lg">
+            <p className="text-foreground font-medium mb-3 md:mb-4 text-sm md:text-base">
               Tidak menemukan jawaban yang Anda cari?
             </p>
             <Button 
-              className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground gap-2 px-6 py-5"
-              onClick={() => window.open('https://wa.me/6281234567890', '_blank')}
+              className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground gap-2 px-5 md:px-6 py-4 md:py-5 text-sm md:text-base"
+              onClick={() => window.open('https://wa.me/6281233330042', '_blank')}
             >
-              <MessageCircle className="w-5 h-5" />
+              <MessageCircle className="w-4 h-4 md:w-5 md:h-5" />
               Hubungi Kami
             </Button>
           </div>

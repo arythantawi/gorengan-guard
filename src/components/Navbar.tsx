@@ -29,14 +29,14 @@ const Navbar = () => {
     label: 'Cek Pesanan'
   };
   return <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-card/95 backdrop-blur-lg shadow-lg border-b border-border/50' : 'bg-transparent'}`}>
-      <div className="container">
-        <nav className="flex items-center justify-between h-16 md:h-20">
+      <div className="container px-4 sm:px-6">
+        <nav className="flex items-center justify-between h-14 md:h-20">
           {/* Logo */}
-          <a href="/" className="flex items-center gap-2">
-            <div className="w-12 h-12 rounded-full border-2 border-primary/50 bg-white/90 p-0.5 shadow-sm">
+          <a href="/" className="flex items-center gap-1.5 sm:gap-2">
+            <div className="w-9 h-9 sm:w-10 md:w-12 sm:h-10 md:h-12 rounded-full border-2 border-primary/50 bg-white/90 p-0.5 shadow-sm flex-shrink-0">
               <img src={logo44Trans} alt="44 Trans Jawa Bali" className="w-full h-full object-contain rounded-full" />
             </div>
-            <span className={`font-display font-bold text-lg ${isScrolled ? 'text-foreground' : 'text-white'}`}>44 TRANS JAWA BALI</span>
+            <span className={`font-display font-bold text-sm sm:text-base md:text-lg ${isScrolled ? 'text-foreground' : 'text-white'} hidden xs:inline sm:inline`}>44 TRANS JAWA BALI</span>
           </a>
 
           {/* Desktop Navigation */}
