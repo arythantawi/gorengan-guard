@@ -536,7 +536,7 @@ const Booking = () => {
               
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Button 
-                  onClick={() => generateTicketPdf({
+                  onClick={async () => await generateTicketPdf({
                     orderId: orderId,
                     customerName: formData.name,
                     customerPhone: formData.phone,

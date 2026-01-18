@@ -69,7 +69,9 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-3 mb-6">
-              <img src={logo44Trans} alt="44 Trans Jawa Bali" className="w-14 h-14 object-contain" />
+              <div className="w-14 h-14 rounded-full border-2 border-primary/50 bg-white/90 p-0.5 shadow-sm">
+                <img src={logo44Trans} alt="44 Trans Jawa Bali" className="w-full h-full object-contain rounded-full" />
+              </div>
               <span className="font-display font-bold text-xl text-background">44 TRANS JAWA BALI</span>
             </div>
             <p className="text-background/60 text-sm mb-8 leading-relaxed">

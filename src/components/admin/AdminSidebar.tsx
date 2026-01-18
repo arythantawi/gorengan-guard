@@ -31,6 +31,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { cn } from '@/lib/utils';
+import logo44Trans from '@/assets/logo-44trans.png';
 
 interface AdminSidebarProps {
   activeTab: string;
@@ -65,9 +66,14 @@ const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
   return (
     <Sidebar collapsible="icon" className="border-r border-border">
       <SidebarHeader className="p-4 border-b border-border">
-        {!isCollapsed && (
-          <h2 className="font-semibold text-foreground">Menu Admin</h2>
-        )}
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full border-2 border-primary/50 bg-white p-0.5 shadow-sm">
+            <img src={logo44Trans} alt="44 Trans" className="w-full h-full object-contain rounded-full" />
+          </div>
+          {!isCollapsed && (
+            <h2 className="font-semibold text-foreground text-sm">44 TRANS JAWA BALI</h2>
+          )}
+        </div>
       </SidebarHeader>
       
       <SidebarContent>

@@ -33,7 +33,9 @@ const Navbar = () => {
         <nav className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <a href="/" className="flex items-center gap-2">
-            <img src={logo44Trans} alt="44 Trans Jawa Bali" className="w-12 h-12 object-contain" />
+            <div className="w-12 h-12 rounded-full border-2 border-primary/50 bg-white/90 p-0.5 shadow-sm">
+              <img src={logo44Trans} alt="44 Trans Jawa Bali" className="w-full h-full object-contain rounded-full" />
+            </div>
             <span className={`font-display font-bold text-lg ${isScrolled ? 'text-foreground' : 'text-white'}`}>44 TRANS JAWA BALI</span>
           </a>
 
