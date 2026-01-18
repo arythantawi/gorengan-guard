@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, forwardRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { HelpCircle, MessageCircle } from 'lucide-react';
 import {
@@ -21,7 +21,7 @@ interface FAQ {
   category: string | null;
 }
 
-const FAQSection = () => {
+const FAQSection = forwardRef<HTMLElement>((_, ref) => {
   const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showDescription, setShowDescription] = useState(false);
@@ -123,7 +123,7 @@ const FAQSection = () => {
   }, {} as Record<string, FAQ[]>);
 
   return (
-    <section ref={sectionRef} id="faq" className="py-20 bg-muted/20">
+    <section ref={ref || sectionRef} id="faq" className="py-20 bg-muted/20">
       <div className="container">
         <div className="faq-title text-center mb-14">
           <div className="inline-flex items-center gap-2 bg-primary/10 px-5 py-2.5 rounded-full mb-4">
@@ -193,6 +193,8 @@ const FAQSection = () => {
       </div>
     </section>
   );
-};
+});
+
+FAQSection.displayName = 'FAQSection';
 
 export default FAQSection;
