@@ -1,7 +1,6 @@
 import { useEffect, useRef, forwardRef } from "react";
 import { Link } from "react-router-dom";
 import {
-  Bus,
   MapPin,
   Phone,
   Mail,
@@ -15,6 +14,7 @@ import {
 } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import logo44Trans from "@/assets/logo-44trans.png";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -69,9 +69,7 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg">
-                <Bus className="w-6 h-6 text-primary-foreground" />
-              </div>
+              <img src={logo44Trans} alt="44 Trans Jawa Bali" className="w-14 h-14 object-contain" />
               <span className="font-display font-bold text-xl text-background">44 TRANS JAWA BALI</span>
             </div>
             <p className="text-background/60 text-sm mb-8 leading-relaxed">
