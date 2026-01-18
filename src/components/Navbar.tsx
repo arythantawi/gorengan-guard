@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, Bus, Phone, Search } from 'lucide-react';
+import { Menu, X, Phone, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import logo44Trans from '@/assets/logo-44trans.png';
+
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -31,9 +33,7 @@ const Navbar = () => {
         <nav className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <a href="/" className="flex items-center gap-2">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${isScrolled ? 'bg-primary' : 'bg-white/20'}`}>
-              <Bus className={`w-6 h-6 ${isScrolled ? 'text-primary-foreground' : 'text-white'}`} />
-            </div>
+            <img src={logo44Trans} alt="44 Trans Jawa Bali" className="w-12 h-12 object-contain" />
             <span className={`font-display font-bold text-lg ${isScrolled ? 'text-foreground' : 'text-white'}`}>44 TRANS JAWA BALI</span>
           </a>
 
