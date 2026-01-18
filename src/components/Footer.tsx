@@ -1,8 +1,20 @@
-import { useEffect, useRef, forwardRef } from 'react';
-import { Link } from 'react-router-dom';
-import { Bus, MapPin, Phone, Mail, Clock, Instagram, Facebook, MessageCircle, ArrowUpRight, Heart, Search } from 'lucide-react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useEffect, useRef, forwardRef } from "react";
+import { Link } from "react-router-dom";
+import {
+  Bus,
+  MapPin,
+  Phone,
+  Mail,
+  Clock,
+  Instagram,
+  Facebook,
+  MessageCircle,
+  ArrowUpRight,
+  Heart,
+  Search,
+} from "lucide-react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -11,36 +23,36 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
   const currentYear = new Date().getFullYear();
 
   const routes = [
-    'Surabaya - Denpasar',
-    'Malang - Denpasar',
-    'Surabaya - Jakarta',
-    'Surabaya - Jogja',
-    'Surabaya - Malang',
-    'Surabaya - Banyuwangi',
+    "Surabaya - Denpasar",
+    "Malang - Denpasar",
+    "Surabaya - Jakarta",
+    "Surabaya - Jogja",
+    "Surabaya - Malang",
+    "Surabaya - Banyuwangi",
   ];
 
   const serviceHours = [
-    { day: 'Senin - Jumat', hours: '06:00 - 22:00' },
-    { day: 'Sabtu - Minggu', hours: '07:00 - 21:00' },
+    { day: "Senin - Jumat", hours: "06:00 - 22:00" },
+    { day: "Sabtu - Minggu", hours: "07:00 - 21:00" },
   ];
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   useEffect(() => {
     const ctx = gsap.context(() => {
       // Parallax for footer content
-      gsap.from('.footer-content > div', {
+      gsap.from(".footer-content > div", {
         scrollTrigger: {
           trigger: footerRef.current,
-          start: 'top 90%',
+          start: "top 90%",
         },
         y: 40,
         opacity: 0,
         duration: 0.6,
         stagger: 0.1,
-        ease: 'power2.out'
+        ease: "power2.out",
       });
     }, footerRef);
 
@@ -51,7 +63,7 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
     <footer ref={ref || footerRef} id="kontak" className="bg-foreground text-background relative">
       {/* Decorative top border */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-primary" />
-      
+
       <div className="container py-16 md:py-20">
         <div className="footer-content grid md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Brand */}
@@ -60,13 +72,10 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
               <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg">
                 <Bus className="w-6 h-6 text-primary-foreground" />
               </div>
-              <span className="font-display font-bold text-xl text-background">
-                Travel Minibus
-              </span>
+              <span className="font-display font-bold text-xl text-background">Travel Minibus</span>
             </div>
             <p className="text-background/60 text-sm mb-8 leading-relaxed">
-              Layanan travel minibus profesional untuk perjalanan nyaman dan aman 
-              ke berbagai kota di Jawa dan Bali.
+              Layanan travel minibus profesional untuk perjalanan nyaman dan aman ke berbagai kota di Jawa dan Bali.
             </p>
             <div className="flex gap-3">
               <a
@@ -132,7 +141,8 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
             </div>
             <div className="mt-6 p-4 bg-gradient-to-br from-accent/20 to-accent/10 rounded-xl border border-accent/20">
               <p className="text-sm text-background/80">
-                <span className="text-accent font-semibold">📞 Hotline 24 Jam</span><br />
+                <span className="text-accent font-semibold">📞 Hotline 24 Jam</span>
+                <br />
                 Untuk informasi & bantuan darurat
               </p>
             </div>
@@ -185,7 +195,8 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
                 <div>
                   <p className="text-xs text-background/50">Kantor Pusat</p>
                   <p className="text-background font-medium text-sm">
-                    Jl. Raya Surabaya No. 123<br />
+                    Jl. Raya Surabaya No. 123
+                    <br />
                     Surabaya, Jawa Timur
                   </p>
                 </div>
@@ -199,7 +210,8 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
       <div className="border-t border-background/10">
         <div className="container py-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-background/50 text-sm flex items-center gap-1">
-            © {currentYear} Travel Minibus. Made with <Heart className="w-4 h-4 text-red-500 fill-red-500" /> in Indonesia
+            © {currentYear} 44 TRANS JAWA BALI. Made with <Heart className="w-4 h-4 text-red-500 fill-red-500" /> in
+            Indonesia
           </p>
           <div className="flex items-center gap-6 text-sm">
             <a href="#" className="text-background/50 hover:text-accent transition-colors">
@@ -222,6 +234,6 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
   );
 });
 
-Footer.displayName = 'Footer';
+Footer.displayName = "Footer";
 
 export default Footer;
