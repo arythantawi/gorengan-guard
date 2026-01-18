@@ -1,4 +1,5 @@
 import jsPDF from 'jspdf';
+import logo44Trans from '@/assets/logo-44trans.png';
 
 export interface ManifestPassenger {
   name: string;
@@ -137,7 +138,7 @@ const sortPassengersByLocation = (
   });
 };
 
-export const generateManifestPdf = (data: ManifestData): void => {
+export const generateManifestPdf = async (data: ManifestData): Promise<void> => {
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
@@ -210,7 +211,35 @@ export const generateManifestPdf = (data: ManifestData): void => {
     }
   };
 
-  // Header - Simple title
+  // Load logo as base64
+  const loadLogo = (): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0);
+        resolve(canvas.toDataURL('image/png'));
+      };
+      img.onerror = () => resolve('');
+      img.src = logo44Trans;
+    });
+  };
+
+  const logoBase64 = await loadLogo();
+
+  // Header with logo
+  if (logoBase64) {
+    doc.setDrawColor(180, 142, 38);
+    doc.setLineWidth(0.5);
+    doc.circle(pageWidth / 2, y + 8, 10, 'S');
+    doc.addImage(logoBase64, 'PNG', pageWidth / 2 - 8, y, 16, 16);
+    y += 20;
+  }
+
   doc.setFontSize(16);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(0, 0, 0);
@@ -219,7 +248,7 @@ export const generateManifestPdf = (data: ManifestData): void => {
 
   doc.setFontSize(11);
   doc.setFont('helvetica', 'normal');
-  doc.text(data.agentName, pageWidth / 2, y, { align: 'center' });
+  doc.text('44 TRANS JAWA BALI', pageWidth / 2, y, { align: 'center' });
   y += 10;
 
   // Trip Info - simple format

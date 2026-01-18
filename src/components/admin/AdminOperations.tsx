@@ -861,7 +861,7 @@ const AdminOperations = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => generateOperationPdf(trip)}
+                      onClick={async () => await generateOperationPdf(trip)}
                       className="text-primary"
                     >
                       <FileDown className="w-4 h-4 mr-1" />

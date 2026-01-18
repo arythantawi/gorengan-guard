@@ -239,8 +239,8 @@ Terima kasih! 🙏`;
     return message;
   };
 
-  const handleSendTicketWhatsApp = (booking: Booking) => {
-    const doc = generateTicketPdf({
+  const handleSendTicketWhatsApp = async (booking: Booking) => {
+    const doc = await generateTicketPdf({
       orderId: booking.order_id,
       customerName: booking.customer_name,
       customerPhone: booking.customer_phone,

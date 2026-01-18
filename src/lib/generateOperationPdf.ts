@@ -1,4 +1,5 @@
 import { jsPDF } from 'jspdf';
+import logo44Trans from '@/assets/logo-44trans.png';
 
 interface TripOperation {
   id: string;
@@ -24,19 +25,19 @@ interface TripOperation {
   vehicle_number: string | null;
 }
 
-export const generateOperationPdf = (trip: TripOperation): void => {
+export const generateOperationPdf = async (trip: TripOperation): Promise<void> => {
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
-    format: [120, 210] // Custom size similar to receipt
+    format: [120, 220] // Custom size similar to receipt (slightly taller for logo)
   });
   
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 8;
   const contentWidth = pageWidth - margin * 2;
   
-  // Colors - blue theme like the image
-  const blue: [number, number, number] = [0, 136, 186];
+  // Colors - gold theme to match brand
+  const gold: [number, number, number] = [180, 142, 38];
   const black: [number, number, number] = [0, 0, 0];
   
   // Helper for currency formatting
@@ -79,35 +80,63 @@ export const generateOperationPdf = (trip: TripOperation): void => {
   const labelCol = 45;
   const midCol = 15;
   const valueCol = contentWidth - labelCol - midCol;
+
+  // Load logo as base64
+  const loadLogo = (): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0);
+        resolve(canvas.toDataURL('image/png'));
+      };
+      img.onerror = () => resolve('');
+      img.src = logo44Trans;
+    });
+  };
+
+  const logoBase64 = await loadLogo();
   
   // === HEADER ===
-  doc.setDrawColor(...blue);
-  doc.setTextColor(...blue);
+  doc.setDrawColor(...gold);
+  doc.setTextColor(...gold);
+
+  // Logo with border
+  if (logoBase64) {
+    doc.setLineWidth(0.5);
+    doc.circle(pageWidth / 2, y + 10, 10, 'S');
+    doc.addImage(logoBase64, 'PNG', pageWidth / 2 - 8, y + 2, 16, 16);
+    y += 22;
+  }
   
   // Company name
-  doc.setFontSize(16);
+  doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.text('Travel Express', pageWidth / 2, y + 5, { align: 'center' });
+  doc.text('44 TRANS JAWA BALI', pageWidth / 2, y + 3, { align: 'center' });
   
   doc.setFontSize(7);
   doc.setFont('helvetica', 'normal');
-  doc.text('LAYANAN ANTAR JEMPUT', pageWidth / 2, y + 10, { align: 'center' });
-  doc.text('SURABAYA - DENPASAR PP', pageWidth / 2, y + 14, { align: 'center' });
+  doc.text('LAYANAN ANTAR JEMPUT', pageWidth / 2, y + 8, { align: 'center' });
+  doc.text('SURABAYA - DENPASAR PP', pageWidth / 2, y + 12, { align: 'center' });
   
   doc.setFontSize(9);
   doc.setFont('helvetica', 'bold');
-  doc.text('OMSET TRAVEL', pageWidth / 2, y + 20, { align: 'center' });
+  doc.text('OMSET TRAVEL', pageWidth / 2, y + 18, { align: 'center' });
   
   // Underline
   doc.setLineWidth(0.5);
-  doc.line(margin, y + 23, pageWidth - margin, y + 23);
+  doc.line(margin, y + 21, pageWidth - margin, y + 21);
   
-  y = 38;
+  y += 28;
   
   // === TABLE HELPERS ===
   const drawInfoRow = (label: string, midLabel: string, value: string) => {
     // Draw borders
-    doc.setDrawColor(...blue);
+    doc.setDrawColor(...gold);
     doc.setLineWidth(0.3);
     doc.rect(margin, y, labelCol, rowHeight, 'S');
     doc.rect(margin + labelCol, y, midCol, rowHeight, 'S');
@@ -127,7 +156,7 @@ export const generateOperationPdf = (trip: TripOperation): void => {
   };
   
   const drawSimpleRow = (label: string, value: string, isBold: boolean = false) => {
-    doc.setDrawColor(...blue);
+    doc.setDrawColor(...gold);
     doc.setLineWidth(0.3);
     doc.rect(margin, y, labelCol + midCol, rowHeight, 'S');
     doc.rect(margin + labelCol + midCol, y, valueCol, rowHeight, 'S');
@@ -142,7 +171,7 @@ export const generateOperationPdf = (trip: TripOperation): void => {
   };
   
   const drawExpenseRow = (label: string, midLabel: string, value: string) => {
-    doc.setDrawColor(...blue);
+    doc.setDrawColor(...gold);
     doc.setLineWidth(0.3);
     doc.rect(margin, y, labelCol, rowHeight, 'S');
     doc.rect(margin + labelCol, y, midCol, rowHeight, 'S');
@@ -164,7 +193,7 @@ export const generateOperationPdf = (trip: TripOperation): void => {
   };
   
   const drawSectionHeader = (title: string) => {
-    doc.setTextColor(...blue);
+    doc.setTextColor(...gold);
     doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
     doc.text(title, margin, y + 5);
@@ -230,7 +259,7 @@ export const generateOperationPdf = (trip: TripOperation): void => {
   
   // Signature area
   y += 3;
-  doc.setDrawColor(...blue);
+  doc.setDrawColor(...gold);
   doc.setLineWidth(0.3);
   
   // Left signature box

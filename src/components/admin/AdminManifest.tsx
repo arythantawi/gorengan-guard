@@ -322,7 +322,7 @@ const AdminManifest = () => {
     }
   };
 
-  const handleGenerateManifest = (bookingsGroup: Booking[]) => {
+  const handleGenerateManifest = async (bookingsGroup: Booking[]) => {
     if (bookingsGroup.length === 0) return;
 
     const firstBooking = bookingsGroup[0];
@@ -355,7 +355,7 @@ const AdminManifest = () => {
       passengers,
     };
 
-    generateManifestPdf(manifestData);
+    await generateManifestPdf(manifestData);
     setIsManifestDialogOpen(false);
     toast.success('Manifes berhasil diunduh');
   };

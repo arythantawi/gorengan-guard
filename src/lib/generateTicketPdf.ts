@@ -1,4 +1,5 @@
 import { jsPDF } from 'jspdf';
+import logo44Trans from '@/assets/logo-44trans.png';
 
 interface TicketData {
   orderId: string;
@@ -18,7 +19,7 @@ interface TicketData {
   paymentStatus?: string;
 }
 
-export const generateTicketPdf = (data: TicketData, options?: { returnBlob?: boolean }): jsPDF | void => {
+export const generateTicketPdf = async (data: TicketData, options?: { returnBlob?: boolean }): Promise<jsPDF | void> => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -69,37 +70,66 @@ export const generateTicketPdf = (data: TicketData, options?: { returnBlob?: boo
     }
   };
 
+  // Load logo as base64
+  const loadLogo = (): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0);
+        resolve(canvas.toDataURL('image/png'));
+      };
+      img.onerror = () => resolve('');
+      img.src = logo44Trans;
+    });
+  };
+
+  const logoBase64 = await loadLogo();
+
   // === HEADER SECTION ===
   // Top accent bar
   doc.setFillColor(...gold);
   doc.rect(0, 0, pageWidth, 8, 'F');
   
   // Company branding area
-  let y = 25;
+  let y = 20;
+  
+  // Logo with border
+  if (logoBase64) {
+    doc.setDrawColor(...gold);
+    doc.setLineWidth(1);
+    doc.circle(margin + 12, y + 5, 13, 'S');
+    doc.addImage(logoBase64, 'PNG', margin + 1, y - 6, 22, 22);
+  }
   
   // Company name with elegant styling
+  const textStartX = logoBase64 ? margin + 28 : margin;
   doc.setTextColor(...black);
-  doc.setFontSize(28);
+  doc.setFontSize(22);
   doc.setFont('helvetica', 'bold');
-  doc.text('TRAVEL EXPRESS', margin, y);
+  doc.text('44 TRANS JAWA BALI', textStartX, y + 2);
   
   // Tagline
   doc.setTextColor(...gray);
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
-  doc.text('Perjalanan Nyaman, Harga Terjangkau', margin, y + 7);
+  doc.text('Perjalanan Nyaman, Harga Terjangkau', textStartX, y + 9);
   
   // Invoice label on right
   doc.setTextColor(...gold);
   doc.setFontSize(24);
   doc.setFont('helvetica', 'bold');
-  doc.text('INVOICE', pageWidth - margin, y, { align: 'right' });
+  doc.text('INVOICE', pageWidth - margin, y + 2, { align: 'right' });
   
   // Document type
   doc.setTextColor(...gray);
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
-  doc.text('E-Ticket & Bukti Pembayaran', pageWidth - margin, y + 7, { align: 'right' });
+  doc.text('E-Ticket & Bukti Pembayaran', pageWidth - margin, y + 9, { align: 'right' });
   
   y = 50;
   drawLine(y, gold);
