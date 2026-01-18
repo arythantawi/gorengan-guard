@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useBanners } from '@/hooks/useSiteData';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import gsap from 'gsap';
@@ -43,9 +43,9 @@ const convertGoogleDriveUrl = (url: string | null): string | null => {
 };
 
 const HeroBanner = () => {
-  const [banners, setBanners] = useState<Banner[]>([]);
+  // Use cached data from context instead of fetching directly
+  const { banners, isLoading } = useBanners();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
   const [isTextVisible, setIsTextVisible] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   
@@ -55,23 +55,6 @@ const HeroBanner = () => {
   const imageRefs = useRef<(HTMLImageElement | HTMLDivElement | null)[]>([]);
   const textOverlayRef = useRef<HTMLDivElement>(null);
   const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    const fetchBanners = async () => {
-      const { data, error } = await supabase
-        .from('banners')
-        .select('*')
-        .eq('is_active', true)
-        .order('display_order', { ascending: true });
-
-      if (!error && data) {
-        setBanners(data);
-      }
-      setIsLoading(false);
-    };
-
-    fetchBanners();
-  }, []);
 
   // Animate slide transition with GSAP
   const animateSlide = useCallback((fromIndex: number, toIndex: number, direction: 'next' | 'prev') => {

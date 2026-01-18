@@ -68,9 +68,10 @@ const ReportFinance = () => {
   const fetchTrips = async () => {
     setIsLoading(true);
     try {
+      // Select only required columns for finance report
       const { data, error } = await supabase
         .from('trip_operations')
-        .select('*')
+        .select('id, trip_date, route_from, route_to, total_passengers, income_tickets, income_other, expense_fuel, expense_ferry, expense_snack, expense_meals, expense_driver_commission, expense_driver_meals, expense_toll, expense_parking, expense_other')
         .order('trip_date', { ascending: true });
 
       if (error) throw error;

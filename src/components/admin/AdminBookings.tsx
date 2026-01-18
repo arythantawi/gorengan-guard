@@ -96,10 +96,12 @@ const AdminBookings = ({ onStatsUpdate }: AdminBookingsProps) => {
   const fetchBookings = async () => {
     setIsLoading(true);
     try {
+      // Select only required columns for listing
       const { data, error } = await supabase
         .from('bookings')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .select('id, order_id, customer_name, customer_phone, customer_email, pickup_address, dropoff_address, notes, route_from, route_to, route_via, pickup_time, travel_date, passengers, total_price, payment_status, payment_proof_url, payment_proof_drive_id, created_at, updated_at')
+        .order('created_at', { ascending: false })
+        .limit(500); // Limit results for performance
 
       if (error) throw error;
       const bookingsData = data || [];

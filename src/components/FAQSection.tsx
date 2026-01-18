@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, forwardRef } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useFaqs } from '@/hooks/useSiteData';
 import { HelpCircle, MessageCircle } from 'lucide-react';
 import {
   Accordion,
@@ -22,27 +22,10 @@ interface FAQ {
 }
 
 const FAQSection = forwardRef<HTMLElement>((_, ref) => {
-  const [faqs, setFaqs] = useState<FAQ[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // Use cached data from context instead of fetching directly
+  const { faqs, isLoading } = useFaqs();
   const [showDescription, setShowDescription] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const fetchFAQs = async () => {
-      const { data, error } = await supabase
-        .from('faqs')
-        .select('*')
-        .eq('is_active', true)
-        .order('display_order', { ascending: true });
-
-      if (!error && data) {
-        setFaqs(data);
-      }
-      setIsLoading(false);
-    };
-
-    fetchFAQs();
-  }, []);
 
   useEffect(() => {
     if (faqs.length === 0) return;

@@ -74,10 +74,12 @@ const AdminVideos = () => {
   const [filterCategory, setFilterCategory] = useState<string>('all');
 
   const fetchVideos = async () => {
+    // Select only required columns
     const { data, error } = await supabase
       .from('videos')
-      .select('*')
-      .order('display_order', { ascending: true });
+      .select('id, title, description, youtube_url, thumbnail_url, display_order, is_active, is_featured, category, created_at')
+      .order('display_order', { ascending: true })
+      .limit(100);
 
     if (!error && data) {
       setVideos(data as Video[]);
