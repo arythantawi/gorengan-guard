@@ -1,66 +1,45 @@
 import { useEffect, useRef, forwardRef } from "react";
 import { Link } from "react-router-dom";
-import {
-  MapPin,
-  Phone,
-  Mail,
-  Clock,
-  Instagram,
-  Facebook,
-  MessageCircle,
-  ArrowUpRight,
-  Heart,
-  Search,
-} from "lucide-react";
+import { MapPin, Phone, Mail, Clock, Instagram, Facebook, MessageCircle, ArrowUpRight, Heart, Search } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import logo44Trans from "@/assets/logo-44trans.png";
-
 gsap.registerPlugin(ScrollTrigger);
-
 const Footer = forwardRef<HTMLElement>((_, ref) => {
   const footerRef = useRef<HTMLElement>(null);
   const currentYear = new Date().getFullYear();
-
-  const routes = [
-    "Surabaya - Denpasar",
-    "Malang - Denpasar",
-    "Surabaya - Jakarta",
-    "Surabaya - Jogja",
-    "Surabaya - Malang",
-    "Surabaya - Banyuwangi",
-  ];
-
-  const serviceHours = [
-    { day: "Senin - Jumat", hours: "06:00 - 22:00" },
-    { day: "Sabtu - Minggu", hours: "07:00 - 21:00" },
-  ];
-
+  const routes = ["Surabaya - Denpasar", "Malang - Denpasar", "Surabaya - Jakarta", "Surabaya - Jogja", "Surabaya - Malang", "Surabaya - Banyuwangi"];
+  const serviceHours = [{
+    day: "Senin - Jumat",
+    hours: "06:00 - 22:00"
+  }, {
+    day: "Sabtu - Minggu",
+    hours: "07:00 - 21:00"
+  }];
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
   };
-
   useEffect(() => {
     const ctx = gsap.context(() => {
       // Parallax for footer content
       gsap.from(".footer-content > div", {
         scrollTrigger: {
           trigger: footerRef.current,
-          start: "top 90%",
+          start: "top 90%"
         },
         y: 40,
         opacity: 0,
         duration: 0.6,
         stagger: 0.1,
-        ease: "power2.out",
+        ease: "power2.out"
       });
     }, footerRef);
-
     return () => ctx.revert();
   }, []);
-
-  return (
-    <footer ref={ref || footerRef} id="kontak" className="bg-foreground text-background relative">
+  return <footer ref={ref || footerRef} id="kontak" className="bg-foreground text-background relative">
       {/* Decorative top border */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-primary" />
 
@@ -78,27 +57,13 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
               Layanan travel minibus profesional untuk perjalanan nyaman dan aman ke berbagai kota di Jawa dan Bali.
             </p>
             <div className="flex gap-3">
-              <a
-                href="#"
-                className="w-11 h-11 rounded-xl bg-background/10 flex items-center justify-center hover:bg-gradient-to-br hover:from-pink-500 hover:to-purple-600 transition-all duration-300 group"
-                aria-label="Instagram"
-              >
+              <a href="#" className="w-11 h-11 rounded-xl bg-background/10 flex items-center justify-center hover:bg-gradient-to-br hover:from-pink-500 hover:to-purple-600 transition-all duration-300 group" aria-label="Instagram">
                 <Instagram className="w-5 h-5 group-hover:scale-110 transition-transform" />
               </a>
-              <a
-                href="#"
-                className="w-11 h-11 rounded-xl bg-background/10 flex items-center justify-center hover:bg-blue-600 transition-all duration-300 group"
-                aria-label="Facebook"
-              >
+              <a href="#" className="w-11 h-11 rounded-xl bg-background/10 flex items-center justify-center hover:bg-blue-600 transition-all duration-300 group" aria-label="Facebook">
                 <Facebook className="w-5 h-5 group-hover:scale-110 transition-transform" />
               </a>
-              <a
-                href="https://wa.me/6281233330042"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-11 h-11 rounded-xl bg-background/10 flex items-center justify-center hover:bg-green-500 transition-all duration-300 group"
-                aria-label="WhatsApp"
-              >
+              <a href="https://wa.me/6281233330042" target="_blank" rel="noopener noreferrer" className="w-11 h-11 rounded-xl bg-background/10 flex items-center justify-center hover:bg-green-500 transition-all duration-300 group" aria-label="WhatsApp">
                 <MessageCircle className="w-5 h-5 group-hover:scale-110 transition-transform" />
               </a>
             </div>
@@ -108,18 +73,13 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
           <div>
             <h4 className="font-display font-semibold text-lg mb-6">Rute Populer</h4>
             <ul className="space-y-3">
-              {routes.map((route) => (
-                <li key={route}>
-                  <a
-                    href="#"
-                    className="text-background/60 text-sm hover:text-accent transition-colors flex items-center gap-2 group"
-                  >
+              {routes.map(route => <li key={route}>
+                  <a href="#" className="text-background/60 text-sm hover:text-accent transition-colors flex items-center gap-2 group">
                     <MapPin className="w-4 h-4 text-primary/60 group-hover:text-accent transition-colors" />
                     <span>{route}</span>
                     <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </a>
-                </li>
-              ))}
+                </li>)}
             </ul>
           </div>
 
@@ -127,8 +87,7 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
           <div>
             <h4 className="font-display font-semibold text-lg mb-6">Jam Operasional</h4>
             <div className="space-y-4">
-              {serviceHours.map((item) => (
-                <div key={item.day} className="flex items-start gap-3">
+              {serviceHours.map(item => <div key={item.day} className="flex items-start gap-3">
                   <div className="w-9 h-9 rounded-lg bg-primary/20 flex items-center justify-center mt-0.5">
                     <Clock className="w-4 h-4 text-primary" />
                   </div>
@@ -136,8 +95,7 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
                     <p className="text-background font-medium text-sm">{item.day}</p>
                     <p className="text-background/50 text-sm">{item.hours}</p>
                   </div>
-                </div>
-              ))}
+                </div>)}
             </div>
             <div className="mt-6 p-4 bg-gradient-to-br from-accent/20 to-accent/10 rounded-xl border border-accent/20">
               <p className="text-sm text-background/80">
@@ -148,10 +106,7 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
             </div>
 
             {/* Track Booking Link */}
-            <Link
-              to="/track"
-              className="mt-4 flex items-center gap-2 text-background/60 hover:text-accent transition-colors group"
-            >
+            <Link to="/track" className="mt-4 flex items-center gap-2 text-background/60 hover:text-accent transition-colors group">
               <div className="w-9 h-9 rounded-lg bg-primary/20 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
                 <Search className="w-4 h-4 text-primary group-hover:text-accent transition-colors" />
               </div>
@@ -164,10 +119,7 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
           <div>
             <h4 className="font-display font-semibold text-lg mb-6">Hubungi Kami</h4>
             <div className="space-y-4">
-              <a
-                href="tel:+6281233330042"
-                className="flex items-start gap-3 text-background/60 hover:text-accent transition-colors group"
-              >
+              <a href="tel:+6281233330042" className="flex items-start gap-3 text-background/60 hover:text-accent transition-colors group">
                 <div className="w-9 h-9 rounded-lg bg-primary/20 flex items-center justify-center mt-0.5 group-hover:bg-accent/20 transition-colors">
                   <Phone className="w-4 h-4 text-primary group-hover:text-accent transition-colors" />
                 </div>
@@ -176,10 +128,7 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
                   <p className="text-background font-medium text-sm">+62 812-3333-0042</p>
                 </div>
               </a>
-              <a
-                href="mailto:info@travelminibus.com"
-                className="flex items-start gap-3 text-background/60 hover:text-accent transition-colors group"
-              >
+              <a href="mailto:info@travelminibus.com" className="flex items-start gap-3 text-background/60 hover:text-accent transition-colors group">
                 <div className="w-9 h-9 rounded-lg bg-primary/20 flex items-center justify-center mt-0.5 group-hover:bg-accent/20 transition-colors">
                   <Mail className="w-4 h-4 text-primary group-hover:text-accent transition-colors" />
                 </div>
@@ -194,10 +143,10 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
                 </div>
                 <div>
                   <p className="text-xs text-background/50">Kantor Pusat</p>
-                  <p className="text-background font-medium text-sm">
-                    Jl. Raya Surabaya No. 123
+                  <p className="text-background font-medium text-xs">
+                    Jl. Letjend Sutoyo No.107, Bungur, Medaeng, Kec. Waru , Kabupaten Sidoarjo, Jawa Timur 61256 
                     <br />
-                    Surabaya, Jawa Timur
+                    ​
                   </p>
                 </div>
               </div>
@@ -219,20 +168,13 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
             <a href="#" className="text-background/50 hover:text-accent transition-colors">
               Kebijakan Privasi
             </a>
-            <button
-              onClick={scrollToTop}
-              className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-background/10 flex items-center justify-center hover:bg-primary transition-colors"
-              aria-label="Kembali ke atas"
-            >
+            <button onClick={scrollToTop} className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-background/10 flex items-center justify-center hover:bg-primary transition-colors" aria-label="Kembali ke atas">
               <ArrowUpRight className="w-4 h-4 md:w-5 md:h-5 -rotate-45" />
             </button>
           </div>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 });
-
 Footer.displayName = "Footer";
-
 export default Footer;
