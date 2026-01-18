@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import RouteCleanup from "@/components/RouteCleanup";
 import LoadingScreen from "@/components/LoadingScreen";
+import { SiteDataProvider } from "@/hooks/useSiteData";
 import Index from "./pages/index";
 import SearchResults from "./pages/search-results";
 import Booking from "./pages/booking";
@@ -43,21 +44,23 @@ const App = () => {
         <Sonner />
         {isLoading && <LoadingScreen onComplete={handleLoadingComplete} />}
         {showApp && (
-          <BrowserRouter>
-            <RouteCleanup />
-            <ErrorBoundary>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/search" element={<SearchResults />} />
-                <Route path="/booking" element={<Booking />} />
-                <Route path="/track" element={<TrackBooking />} />
-                <Route path="/admin/login" element={<AdminLogin />} />
-                <Route path="/admin" element={<Admin />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </ErrorBoundary>
-          </BrowserRouter>
+          <SiteDataProvider>
+            <BrowserRouter>
+              <RouteCleanup />
+              <ErrorBoundary>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/search" element={<SearchResults />} />
+                  <Route path="/booking" element={<Booking />} />
+                  <Route path="/track" element={<TrackBooking />} />
+                  <Route path="/admin/login" element={<AdminLogin />} />
+                  <Route path="/admin" element={<Admin />} />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </ErrorBoundary>
+            </BrowserRouter>
+          </SiteDataProvider>
         )}
       </TooltipProvider>
     </QueryClientProvider>

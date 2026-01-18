@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useTestimonials } from '@/hooks/useSiteData';
 import { Star, Quote, MapPin, ChevronLeft, ChevronRight, User } from 'lucide-react';
 import { Typewriter } from '@/hooks/use-typewriter';
 import { createSafeGsapContext, ensureElementsVisible } from '@/lib/gsapUtils';
@@ -19,29 +19,12 @@ interface Testimonial {
 }
 
 const Testimonials = () => {
-  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // Use cached data from context instead of fetching directly
+  const { testimonials, isLoading } = useTestimonials();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showDescription, setShowDescription] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const fetchTestimonials = async () => {
-      const { data, error } = await supabase
-        .from('testimonials')
-        .select('*')
-        .eq('is_active', true)
-        .order('display_order', { ascending: true });
-
-      if (!error && data) {
-        setTestimonials(data);
-      }
-      setIsLoading(false);
-    };
-
-    fetchTestimonials();
-  }, []);
 
   useEffect(() => {
     if (testimonials.length === 0) return;

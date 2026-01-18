@@ -60,11 +60,13 @@ const OfflineBookingForm = ({ onBookingCreated }: OfflineBookingFormProps) => {
   }, []);
 
   const fetchSchedules = async () => {
+    // Select only required columns for schedule selection (including category for interface compliance)
     const { data, error } = await supabase
       .from('schedules')
-      .select('*')
+      .select('id, route_from, route_to, route_via, pickup_time, price, category, is_active')
       .eq('is_active', true)
-      .order('route_from');
+      .order('route_from')
+      .limit(100);
     
     if (!error && data) {
       setSchedules(data);

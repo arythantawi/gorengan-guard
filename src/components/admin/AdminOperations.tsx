@@ -148,11 +148,13 @@ const AdminOperations = () => {
   const fetchTrips = async () => {
     setIsLoading(true);
     try {
+      // Select all columns for operations (needed for full edit functionality)
       const { data, error } = await supabase
         .from('trip_operations')
         .select('*')
         .order('trip_date', { ascending: false })
-        .order('pickup_time', { ascending: true });
+        .order('pickup_time', { ascending: true })
+        .limit(300); // Limit for performance
 
       if (error) throw error;
       setTrips(data || []);

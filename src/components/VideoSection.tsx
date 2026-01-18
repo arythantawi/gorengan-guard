@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Play, X } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { useVideos } from '@/hooks/useSiteData';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 
@@ -49,29 +49,12 @@ const getYouTubeThumbnail = (url: string, customThumbnail: string | null): strin
 };
 
 const VideoSection = () => {
-  const [videos, setVideos] = useState<Video[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Use cached data from context instead of fetching directly
+  const { videos, isLoading: loading } = useVideos();
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const [isVisible, setIsVisible] = useState(true);
   const [activeCategory, setActiveCategory] = useState<VideoCategory>('semua');
   const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const fetchVideos = async () => {
-      const { data, error } = await supabase
-        .from('videos')
-        .select('*')
-        .eq('is_active', true)
-        .order('display_order', { ascending: true });
-
-      if (!error && data) {
-        setVideos(data as Video[]);
-      }
-      setLoading(false);
-    };
-
-    fetchVideos();
-  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(

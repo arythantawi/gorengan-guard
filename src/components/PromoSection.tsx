@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { usePromos } from '@/hooks/useSiteData';
 import { Tag, Gift, Percent, Copy, Check } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { createSafeGsapContext, ensureElementsVisible } from '@/lib/gsapUtils';
@@ -19,30 +19,10 @@ interface Promo {
 }
 
 const PromoSection = () => {
-  const [promos, setPromos] = useState<Promo[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // Use cached data from context instead of fetching directly
+  const { promos, isLoading } = usePromos();
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const fetchPromos = async () => {
-      const today = new Date().toISOString().split('T')[0];
-      
-      const { data, error } = await supabase
-        .from('promos')
-        .select('*')
-        .eq('is_active', true)
-        .or(`start_date.is.null,start_date.lte.${today}`)
-        .or(`end_date.is.null,end_date.gte.${today}`);
-
-      if (!error && data) {
-        setPromos(data);
-      }
-      setIsLoading(false);
-    };
-
-    fetchPromos();
-  }, []);
 
   useEffect(() => {
     if (promos.length === 0) return;

@@ -169,13 +169,14 @@ const AdminContent = () => {
 
   const [isSaving, setIsSaving] = useState(false);
 
-  // Fetch functions
+  // Fetch functions - optimized with specific column selection
   const fetchBanners = async () => {
     setBannersLoading(true);
     const { data, error } = await supabase
       .from('banners')
-      .select('*')
-      .order('display_order');
+      .select('id, title, subtitle, image_url, link_url, button_text, layout_type, display_order, is_active, created_at, updated_at')
+      .order('display_order')
+      .limit(100);
     if (!error) setBanners(data || []);
     setBannersLoading(false);
   };
@@ -184,8 +185,9 @@ const AdminContent = () => {
     setPromosLoading(true);
     const { data, error } = await supabase
       .from('promos')
-      .select('*')
-      .order('created_at', { ascending: false });
+      .select('id, title, description, discount_text, promo_code, start_date, end_date, is_active, created_at, updated_at')
+      .order('created_at', { ascending: false })
+      .limit(100);
     if (!error) setPromos(data || []);
     setPromosLoading(false);
   };
@@ -194,8 +196,9 @@ const AdminContent = () => {
     setFaqsLoading(true);
     const { data, error } = await supabase
       .from('faqs')
-      .select('*')
-      .order('display_order');
+      .select('id, question, answer, category, display_order, is_active, created_at, updated_at')
+      .order('display_order')
+      .limit(100);
     if (!error) setFaqs(data || []);
     setFaqsLoading(false);
   };
@@ -204,17 +207,16 @@ const AdminContent = () => {
     setTestimonialsLoading(true);
     const { data, error } = await supabase
       .from('testimonials')
-      .select('*')
-      .order('display_order');
+      .select('id, customer_name, customer_photo_url, customer_location, rating, testimonial_text, route_taken, display_order, is_active, created_at, updated_at')
+      .order('display_order')
+      .limit(100);
     if (!error) setTestimonials(data || []);
     setTestimonialsLoading(false);
   };
 
   useEffect(() => {
-    fetchBanners();
-    fetchPromos();
-    fetchFaqs();
-    fetchTestimonials();
+    // Fetch all admin data in parallel
+    Promise.all([fetchBanners(), fetchPromos(), fetchFaqs(), fetchTestimonials()]);
   }, []);
 
   // Banner handlers

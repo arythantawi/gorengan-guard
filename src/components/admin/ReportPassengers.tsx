@@ -53,6 +53,7 @@ const ReportPassengers = () => {
   const fetchTrips = async () => {
     setIsLoading(true);
     try {
+      // Already optimized - only selecting required columns
       const { data, error } = await supabase
         .from('trip_operations')
         .select('id, trip_date, route_from, route_to, route_via, total_passengers, pickup_time')

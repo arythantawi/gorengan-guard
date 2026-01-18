@@ -107,12 +107,14 @@ const AdminSchedules = () => {
   const fetchSchedules = async () => {
     setIsLoading(true);
     try {
+      // Select only required columns
       const { data, error } = await supabase
         .from('schedules')
-        .select('*')
+        .select('id, route_from, route_to, route_via, pickup_time, category, price, is_active, created_at, updated_at')
         .order('category', { ascending: true })
         .order('route_from', { ascending: true })
-        .order('pickup_time', { ascending: true });
+        .order('pickup_time', { ascending: true })
+        .limit(200);
 
       if (error) throw error;
       setSchedules(data || []);
