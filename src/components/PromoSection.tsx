@@ -95,70 +95,70 @@ const PromoSection = () => {
   };
 
   return (
-    <section ref={sectionRef} className="py-20 bg-background">
-      <div className="container">
-        <div className="promo-title text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-accent/10 px-5 py-2.5 rounded-full mb-4">
-            <Gift className="w-5 h-5 text-accent" />
-            <span className="text-sm font-semibold text-accent">Promo Spesial</span>
+    <section ref={sectionRef} className="py-12 md:py-20 bg-background">
+      <div className="container px-4 sm:px-6">
+        <div className="promo-title text-center mb-8 md:mb-12">
+          <div className="inline-flex items-center gap-1.5 md:gap-2 bg-accent/10 px-4 md:px-5 py-2 md:py-2.5 rounded-full mb-3 md:mb-4">
+            <Gift className="w-4 h-4 md:w-5 md:h-5 text-accent" />
+            <span className="text-xs md:text-sm font-semibold text-accent">Promo Spesial</span>
           </div>
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
+          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3 md:mb-4">
             Penawaran Terbaik Untuk Anda
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-muted-foreground max-w-2xl mx-auto text-sm md:text-base">
             Dapatkan diskon menarik untuk perjalanan Anda
           </p>
         </div>
 
-        <div className="promo-grid grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <div className="promo-grid grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-6xl mx-auto">
           {promos.map((promo) => (
             <div
               key={promo.id}
-              className="promo-card group bg-card rounded-2xl border border-border p-7 hover:shadow-xl transition-all duration-500 relative overflow-hidden hover:-translate-y-1"
+              className="promo-card group bg-card rounded-xl md:rounded-2xl border border-border p-5 md:p-7 hover:shadow-xl transition-all duration-500 relative overflow-hidden hover:-translate-y-1"
             >
-              <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-accent/10 to-transparent rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500" />
+              <div className="absolute top-0 right-0 w-32 md:w-40 h-32 md:h-40 bg-gradient-to-br from-accent/10 to-transparent rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500" />
               
               <div className="relative z-10">
-                <div className="flex items-start justify-between mb-5">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <Percent className="w-7 h-7 text-accent" />
+                <div className="flex items-start justify-between mb-4 md:mb-5 gap-2">
+                  <div className="w-11 h-11 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
+                    <Percent className="w-5 h-5 md:w-7 md:h-7 text-accent" />
                   </div>
                   {promo.discount_text && (
-                    <Badge className="bg-gradient-to-r from-accent to-yellow-500 text-accent-foreground text-lg px-4 py-1.5 font-bold shadow-lg">
+                    <Badge className="bg-gradient-to-r from-accent to-yellow-500 text-accent-foreground text-sm md:text-lg px-3 md:px-4 py-1 md:py-1.5 font-bold shadow-lg">
                       {promo.discount_text}
                     </Badge>
                   )}
                 </div>
 
-                <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
+                <h3 className="text-base md:text-xl font-bold text-foreground mb-1.5 md:mb-2 group-hover:text-primary transition-colors">
                   {promo.title}
                 </h3>
                 
                 {promo.description && (
-                  <p className="text-muted-foreground mb-5 leading-relaxed">
+                  <p className="text-muted-foreground text-sm md:text-base mb-4 md:mb-5 leading-relaxed">
                     {promo.description}
                   </p>
                 )}
 
                 {promo.promo_code && (
-                  <div 
+                  <div
                     onClick={() => copyPromoCode(promo.promo_code!)}
-                    className="bg-muted rounded-xl p-4 flex items-center justify-between cursor-pointer hover:bg-muted/80 transition-colors border-2 border-dashed border-primary/20 hover:border-primary/40"
+                    className="bg-muted rounded-lg md:rounded-xl p-3 md:p-4 flex items-center justify-between cursor-pointer hover:bg-muted/80 transition-colors border-2 border-dashed border-primary/20 hover:border-primary/40"
                   >
-                    <div className="flex items-center gap-3">
-                      <Tag className="w-5 h-5 text-primary" />
-                      <span className="font-mono font-bold text-lg text-foreground tracking-wider">
+                    <div className="flex items-center gap-2 md:gap-3">
+                      <Tag className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+                      <span className="font-mono font-bold text-sm md:text-lg text-foreground tracking-wider">
                         {promo.promo_code}
                       </span>
                     </div>
                     {copiedCode === promo.promo_code ? (
                       <div className="flex items-center gap-1 text-green-600">
-                        <Check className="w-4 h-4" />
+                        <Check className="w-3.5 h-3.5 md:w-4 md:h-4" />
                         <span className="text-xs font-medium">Tersalin!</span>
                       </div>
                     ) : (
                       <div className="flex items-center gap-1 text-muted-foreground group-hover:text-primary transition-colors">
-                        <Copy className="w-4 h-4" />
+                        <Copy className="w-3.5 h-3.5 md:w-4 md:h-4" />
                         <span className="text-xs">Salin</span>
                       </div>
                     )}

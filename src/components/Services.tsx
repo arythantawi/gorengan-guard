@@ -270,47 +270,47 @@ const Services = () => {
 
   return (
     <>
-      <section ref={sectionRef} className="py-20 bg-muted/30">
-        <div className="container">
-          <div className="service-title text-center mb-14">
-            <span className="inline-block px-5 py-2 bg-primary/10 text-primary rounded-full text-sm font-semibold mb-4">
+      <section ref={sectionRef} className="py-12 md:py-20 bg-muted/30">
+        <div className="container px-4 sm:px-6">
+          <div className="service-title text-center mb-10 md:mb-14">
+            <span className="inline-block px-4 md:px-5 py-1.5 md:py-2 bg-primary/10 text-primary rounded-full text-xs md:text-sm font-semibold mb-3 md:mb-4">
               Layanan Kami
             </span>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">
+            <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">
               Kemudahan Perjalanan Anda
             </h2>
           </div>
 
-          <div className="services-grid grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="services-grid grid sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 lg:gap-8 max-w-5xl mx-auto">
             {services.map((service, index) => (
               <div
                 key={index}
-                className="service-card group relative bg-card rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-border/50 hover:border-primary/20 overflow-hidden hover:-translate-y-2 cursor-pointer"
+                className="service-card group relative bg-card rounded-2xl md:rounded-3xl p-5 md:p-6 lg:p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-border/50 hover:border-primary/20 overflow-hidden hover:-translate-y-2 cursor-pointer"
                 onClick={() => handleServiceClick(service.dialogType)}
               >
                 {/* Gradient background on hover */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${service.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
                 
                 <div className="relative z-10">
-                  <div className={`w-20 h-20 mb-8 rounded-2xl bg-gradient-to-br ${service.gradient} flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-500`}>
-                    <service.icon className="w-10 h-10 text-white" strokeWidth={1.5} />
+                  <div className={`w-14 h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 mb-5 md:mb-6 lg:mb-8 rounded-xl md:rounded-2xl bg-gradient-to-br ${service.gradient} flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-500`}>
+                    <service.icon className="w-7 h-7 md:w-8 md:h-8 lg:w-10 lg:h-10 text-white" strokeWidth={1.5} />
                   </div>
                   
-                  <h3 className="font-display text-xl font-bold text-foreground mb-3">
+                  <h3 className="font-display text-base md:text-lg lg:text-xl font-bold text-foreground mb-2 md:mb-3">
                     {service.title}
                   </h3>
                   
-                  <p className="text-muted-foreground mb-6">
+                  <p className="text-muted-foreground text-sm md:text-base mb-4 md:mb-6">
                     {service.description}
                   </p>
 
-                  <div className="flex items-center text-primary font-medium text-sm group-hover:gap-3 transition-all duration-300">
+                  <div className="flex items-center text-primary font-medium text-xs md:text-sm group-hover:gap-2 md:group-hover:gap-3 transition-all duration-300">
                     <span>
                       {service.dialogType === 'schedule' && 'Cek Jadwal'}
                       {service.dialogType === 'price' && 'Cek Harga'}
                       {service.dialogType === 'booking' && 'Cara Pemesanan'}
                     </span>
-                    <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                    <ArrowRight className="w-3.5 h-3.5 md:w-4 md:h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
                   </div>
                 </div>
               </div>
@@ -321,18 +321,18 @@ const Services = () => {
 
       {/* Schedule Dialog */}
       <Dialog open={showSchedule} onOpenChange={setShowSchedule}>
-        <DialogContent className="max-w-4xl max-h-[85vh] flex flex-col">
+        <DialogContent className="max-w-4xl max-h-[85vh] flex flex-col mx-4 sm:mx-auto">
           <div ref={scheduleDialogRef} className="flex flex-col h-full overflow-hidden">
             <DialogHeader className="schedule-header flex-shrink-0">
-              <DialogTitle className="text-2xl font-display flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
-                  <CalendarClock className="w-5 h-5 text-white" />
+              <DialogTitle className="text-lg md:text-2xl font-display flex items-center gap-2 md:gap-3">
+                <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+                  <CalendarClock className="w-4 h-4 md:w-5 md:h-5 text-white" />
                 </div>
-                Jadwal Lengkap Keberangkatan
+                <span className="text-base md:text-xl">Jadwal Lengkap Keberangkatan</span>
               </DialogTitle>
             </DialogHeader>
             
-            <div className="flex-1 overflow-y-auto pr-2 space-y-4 mt-4 min-h-0">
+            <div className="flex-1 overflow-y-auto pr-1 md:pr-2 space-y-3 md:space-y-4 mt-3 md:mt-4 min-h-0">
               {routeCategories.map((category) => (
                 <div
                   key={category.name}

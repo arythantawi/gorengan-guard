@@ -118,21 +118,21 @@ const VideoSection = () => {
   const otherVideos = featuredVideo ? filteredVideos.filter(v => v.id !== featuredVideo.id) : [];
 
   return (
-    <section ref={sectionRef} className="py-16 bg-secondary/30">
-      <div className="container">
+    <section ref={sectionRef} className="py-12 md:py-16 bg-secondary/30">
+      <div className="container px-4 sm:px-6">
         {/* Section Header */}
         <div 
-          className={`text-center mb-8 transition-all duration-700 ${
+          className={`text-center mb-6 md:mb-8 transition-all duration-700 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
         >
-          <span className="inline-block px-4 py-1.5 bg-accent/10 text-accent rounded-full text-sm font-medium mb-4">
+          <span className="inline-block px-3 md:px-4 py-1 md:py-1.5 bg-accent/10 text-accent rounded-full text-xs md:text-sm font-medium mb-3 md:mb-4">
             Video Promosi
           </span>
-          <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-foreground mb-3 md:mb-4">
             Lihat Perjalanan Kami
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-muted-foreground max-w-2xl mx-auto text-sm md:text-base">
             Tonton video untuk melihat pengalaman perjalanan bersama Travel Minibus
           </p>
         </div>
@@ -140,7 +140,7 @@ const VideoSection = () => {
         {/* Category Filter */}
         {availableCategories.length > 2 && (
           <div 
-            className={`flex flex-wrap justify-center gap-2 mb-8 transition-all duration-700 delay-100 ${
+            className={`flex flex-wrap justify-center gap-1.5 md:gap-2 mb-6 md:mb-8 transition-all duration-700 delay-100 ${
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             }`}
           >
@@ -150,7 +150,7 @@ const VideoSection = () => {
                 variant={activeCategory === category ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setActiveCategory(category)}
-                className="rounded-full"
+                className="rounded-full text-xs md:text-sm px-3 md:px-4"
               >
                 {categoryLabels[category] || category}
               </Button>
@@ -168,12 +168,12 @@ const VideoSection = () => {
         {/* Featured Video */}
         {featuredVideo && (
           <div 
-            className={`mb-8 transition-all duration-700 delay-200 ${
+            className={`mb-6 md:mb-8 transition-all duration-700 delay-200 ${
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             }`}
           >
             <div 
-              className="relative group cursor-pointer rounded-2xl overflow-hidden shadow-xl"
+              className="relative group cursor-pointer rounded-xl md:rounded-2xl overflow-hidden shadow-xl"
               onClick={() => setSelectedVideo(featuredVideo)}
             >
               <div className="aspect-video bg-muted">
@@ -193,25 +193,25 @@ const VideoSection = () => {
               
               {/* Play Button Overlay */}
               <div className="absolute inset-0 bg-black/40 flex items-center justify-center transition-colors group-hover:bg-black/50">
-                <div className="w-20 h-20 rounded-full bg-primary flex items-center justify-center transform transition-transform group-hover:scale-110">
-                  <Play className="w-8 h-8 text-primary-foreground ml-1" fill="currentColor" />
+                <div className="w-14 h-14 md:w-20 md:h-20 rounded-full bg-primary flex items-center justify-center transform transition-transform group-hover:scale-110">
+                  <Play className="w-6 h-6 md:w-8 md:h-8 text-primary-foreground ml-0.5 md:ml-1" fill="currentColor" />
                 </div>
               </div>
 
               {/* Category Badge */}
-              <div className="absolute top-4 left-4">
-                <span className="px-3 py-1 bg-primary/90 text-primary-foreground text-sm font-medium rounded-full capitalize">
+              <div className="absolute top-2 md:top-4 left-2 md:left-4">
+                <span className="px-2 md:px-3 py-0.5 md:py-1 bg-primary/90 text-primary-foreground text-xs md:text-sm font-medium rounded-full capitalize">
                   {featuredVideo.category}
                 </span>
               </div>
 
               {/* Video Info */}
-              <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent">
-                <h3 className="text-white text-xl md:text-2xl font-bold mb-2">
+              <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-black/80 to-transparent">
+                <h3 className="text-white text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2">
                   {featuredVideo.title}
                 </h3>
                 {featuredVideo.description && (
-                  <p className="text-white/80 text-sm md:text-base line-clamp-2">
+                  <p className="text-white/80 text-xs md:text-sm lg:text-base line-clamp-2">
                     {featuredVideo.description}
                   </p>
                 )}
@@ -222,7 +222,7 @@ const VideoSection = () => {
 
         {/* Other Videos Grid */}
         {otherVideos.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {otherVideos.map((video, index) => (
               <div
                 key={video.id}
@@ -232,7 +232,7 @@ const VideoSection = () => {
                 style={{ transitionDelay: `${300 + index * 100}ms` }}
                 onClick={() => setSelectedVideo(video)}
               >
-                <div className="relative rounded-xl overflow-hidden shadow-lg">
+                <div className="relative rounded-lg md:rounded-xl overflow-hidden shadow-lg">
                   <div className="aspect-video bg-muted">
                     <img
                       src={getYouTubeThumbnail(video.youtube_url, video.thumbnail_url)}
@@ -257,13 +257,13 @@ const VideoSection = () => {
                   
                   {/* Play Button Overlay */}
                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center">
-                      <Play className="w-6 h-6 text-primary-foreground ml-0.5" fill="currentColor" />
+                    <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-primary flex items-center justify-center">
+                      <Play className="w-5 h-5 md:w-6 md:h-6 text-primary-foreground ml-0.5" fill="currentColor" />
                     </div>
                   </div>
                 </div>
                 
-                <h4 className="mt-3 font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                <h4 className="mt-2 md:mt-3 font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 text-sm md:text-base">
                   {video.title}
                 </h4>
               </div>
