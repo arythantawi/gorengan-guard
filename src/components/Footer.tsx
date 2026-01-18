@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, forwardRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Bus, MapPin, Phone, Mail, Clock, Instagram, Facebook, MessageCircle, ArrowUpRight, Heart, Search } from 'lucide-react';
 import gsap from 'gsap';
@@ -6,7 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const Footer = () => {
+const Footer = forwardRef<HTMLElement>((_, ref) => {
   const footerRef = useRef<HTMLElement>(null);
   const currentYear = new Date().getFullYear();
 
@@ -48,7 +48,7 @@ const Footer = () => {
   }, []);
 
   return (
-    <footer ref={footerRef} id="kontak" className="bg-foreground text-background relative">
+    <footer ref={ref || footerRef} id="kontak" className="bg-foreground text-background relative">
       {/* Decorative top border */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-primary" />
       
@@ -220,6 +220,8 @@ const Footer = () => {
       </div>
     </footer>
   );
-};
+});
+
+Footer.displayName = 'Footer';
 
 export default Footer;
