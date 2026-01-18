@@ -91,7 +91,9 @@ const AdminUsers = () => {
   const [mfaResetDialogOpen, setMfaResetDialogOpen] = useState(false);
   const [selectedAdmin, setSelectedAdmin] = useState<AdminUser | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
   const [isResettingMFA, setIsResettingMFA] = useState(false);
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
 
   const [newAdminForm, setNewAdminForm] = useState({
     email: '',
@@ -212,25 +214,31 @@ const AdminUsers = () => {
       return;
     }
 
+    setIsResettingPassword(true);
     try {
-      // Send password reset email
-      const { error } = await supabase.auth.resetPasswordForEmail(selectedAdmin.email, {
-        redirectTo: `${window.location.origin}/admin/login`,
+      // Use edge function to directly update password
+      const { data, error } = await supabase.functions.invoke('update-admin-password', {
+        body: {
+          user_id: selectedAdmin.user_id,
+          new_password: resetForm.newPassword,
+        },
       });
 
       if (error) throw error;
+      
+      if (data?.error) {
+        throw new Error(data.error);
+      }
 
-      await logActivity('password_reset_requested', selectedAdmin.email, {
-        requested_by: 'super_admin',
-      });
-
-      toast.success('Email reset password telah dikirim');
+      toast.success(data?.message || 'Password berhasil diubah');
       setResetDialogOpen(false);
       setResetForm({ newPassword: '', confirmPassword: '' });
       setSelectedAdmin(null);
     } catch (error: any) {
       console.error('Error resetting password:', error);
       toast.error(error.message || 'Gagal reset password');
+    } finally {
+      setIsResettingPassword(false);
     }
   };
 
@@ -561,19 +569,57 @@ const AdminUsers = () => {
       <Dialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Reset Password</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <Key className="w-5 h-5 text-primary" />
+              Ubah Password
+            </DialogTitle>
             <DialogDescription>
-              Kirim email reset password ke {selectedAdmin?.email}
+              Ubah password untuk {selectedAdmin?.email}
             </DialogDescription>
           </DialogHeader>
-          <div className="py-4">
-            <p className="text-sm text-muted-foreground">
-              Email berisi link untuk reset password akan dikirim ke alamat email admin.
-            </p>
+          <div className="py-4 space-y-4">
+            <div className="space-y-2">
+              <Label>Password Baru</Label>
+              <div className="relative">
+                <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  type={showResetPassword ? 'text' : 'password'}
+                  placeholder="Minimal 6 karakter"
+                  value={resetForm.newPassword}
+                  onChange={(e) => setResetForm(prev => ({ ...prev, newPassword: e.target.value }))}
+                  className="pl-10 pr-10"
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2"
+                  onClick={() => setShowResetPassword(!showResetPassword)}
+                >
+                  {showResetPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Konfirmasi Password</Label>
+              <div className="relative">
+                <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  type={showResetPassword ? 'text' : 'password'}
+                  placeholder="Ulangi password baru"
+                  value={resetForm.confirmPassword}
+                  onChange={(e) => setResetForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                  className="pl-10"
+                />
+              </div>
+            </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setResetDialogOpen(false)}>Batal</Button>
-            <Button onClick={resetPassword}>Kirim Email Reset</Button>
+            <Button variant="outline" onClick={() => setResetDialogOpen(false)} disabled={isResettingPassword}>
+              Batal
+            </Button>
+            <Button onClick={resetPassword} disabled={isResettingPassword}>
+              {isResettingPassword && <RefreshCw className="w-4 h-4 mr-2 animate-spin" />}
+              Ubah Password
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
