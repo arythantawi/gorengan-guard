@@ -64,17 +64,17 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
       {/* Decorative top border */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-primary" />
 
-      <div className="container py-16 md:py-20">
-        <div className="footer-content grid md:grid-cols-2 lg:grid-cols-4 gap-12">
+      <div className="container px-4 sm:px-6 py-12 md:py-16 lg:py-20">
+        <div className="footer-content grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
           {/* Brand */}
-          <div>
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-14 h-14 rounded-full border-2 border-primary/50 bg-white/90 p-0.5 shadow-sm">
+          <div className="sm:col-span-2 lg:col-span-1">
+            <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
+              <div className="w-12 h-12 md:w-14 md:h-14 rounded-full border-2 border-primary/50 bg-white/90 p-0.5 shadow-sm flex-shrink-0">
                 <img src={logo44Trans} alt="44 Trans Jawa Bali" className="w-full h-full object-contain rounded-full" />
               </div>
-              <span className="font-display font-bold text-xl text-background">44 TRANS JAWA BALI</span>
+              <span className="font-display font-bold text-lg md:text-xl text-background">44 TRANS JAWA BALI</span>
             </div>
-            <p className="text-background/60 text-sm mb-8 leading-relaxed">
+            <p className="text-background/60 text-sm mb-6 md:mb-8 leading-relaxed">
               Layanan travel minibus profesional untuk perjalanan nyaman dan aman ke berbagai kota di Jawa dan Bali.
             </p>
             <div className="flex gap-3">
@@ -208,12 +208,11 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
 
       {/* Bottom Bar */}
       <div className="border-t border-background/10">
-        <div className="container py-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-background/50 text-sm flex items-center gap-1">
-            © {currentYear} Travel Minibus. Made with <Heart className="w-4 h-4 text-red-500 fill-red-500" /> in
-            Indonesia
+        <div className="container px-4 sm:px-6 py-4 md:py-6 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-background/50 text-xs md:text-sm flex items-center gap-1 text-center md:text-left">
+            © {currentYear} 44 Trans Jawa Bali. Made with <Heart className="w-3 h-3 md:w-4 md:h-4 text-red-500 fill-red-500" /> in Indonesia
           </p>
-          <div className="flex items-center gap-6 text-sm">
+          <div className="flex items-center gap-4 md:gap-6 text-xs md:text-sm flex-wrap justify-center">
             <a href="#" className="text-background/50 hover:text-accent transition-colors">
               Syarat & Ketentuan
             </a>
@@ -222,10 +221,10 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
             </a>
             <button
               onClick={scrollToTop}
-              className="w-10 h-10 rounded-xl bg-background/10 flex items-center justify-center hover:bg-primary transition-colors"
+              className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-background/10 flex items-center justify-center hover:bg-primary transition-colors"
               aria-label="Kembali ke atas"
             >
-              <ArrowUpRight className="w-5 h-5 -rotate-45" />
+              <ArrowUpRight className="w-4 h-4 md:w-5 md:h-5 -rotate-45" />
             </button>
           </div>
         </div>

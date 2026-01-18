@@ -246,11 +246,11 @@ const Hero = () => {
   }, []);
 
   return (
-    <section ref={heroRef} className="relative min-h-screen lg:min-h-[95vh] flex items-center overflow-hidden pt-20">
+    <section ref={heroRef} className="relative min-h-[100svh] lg:min-h-[95vh] flex items-center overflow-hidden pt-16 md:pt-20">
       {/* Clean gradient background - parallax layer */}
       <div 
         ref={bgGradientRef}
-        className="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-primary/85" 
+        className="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-primary/85"
         style={{ willChange: 'transform' }}
       />
       
@@ -277,17 +277,17 @@ const Hero = () => {
         }} 
       />
 
-      <div className="container relative z-10 py-12 lg:py-20">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+      <div className="container relative z-10 py-8 md:py-12 lg:py-20 px-4 sm:px-6">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
           <div ref={contentRef} className="text-white" style={{ willChange: 'transform, opacity' }}>
             {/* Badge */}
-            <div ref={badgeRef} className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-5 py-2.5 rounded-full mb-8 border border-white/10">
+            <div ref={badgeRef} className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 md:px-5 py-2 md:py-2.5 rounded-full mb-6 md:mb-8 border border-white/10">
               <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-              <span className="text-sm font-medium tracking-wide">Travel Minibus Terpercaya</span>
+              <span className="text-xs md:text-sm font-medium tracking-wide">Travel Minibus Terpercaya</span>
             </div>
 
             {/* Title with split text animation */}
-            <h1 className="font-display text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.15] mb-8">
+            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.15] mb-6 md:mb-8">
               <div ref={titleLine1Ref} className="pb-2 overflow-visible">
                 <span className="text-white inline">
                   Perjalanan Nyaman ke
@@ -301,7 +301,7 @@ const Hero = () => {
             </h1>
 
             {/* Subtitle with typewriter effect */}
-            <p ref={subtitleRef} className="text-lg md:text-xl text-white/70 mb-10 max-w-lg leading-relaxed min-h-[4rem]">
+            <p ref={subtitleRef} className="text-base md:text-lg lg:text-xl text-white/70 mb-8 md:mb-10 max-w-lg leading-relaxed min-h-[3rem] md:min-h-[4rem]">
               {showSubtitle && (
                 <Typewriter
                   text="Layanan travel minibus door-to-door dengan armada modern, jadwal fleksibel, dan harga terjangkau untuk perjalanan Anda."
@@ -313,39 +313,39 @@ const Hero = () => {
             </p>
 
             {/* Stats */}
-            <div ref={statsRef} className="flex flex-wrap gap-8">
+            <div ref={statsRef} className="flex flex-wrap gap-4 md:gap-8">
               <div className="group">
-                <div className="flex items-center gap-3 mb-1">
-                  <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors duration-300">
-                    <MapPin className="w-5 h-5" />
+                <div className="flex items-center gap-2 md:gap-3 mb-1">
+                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors duration-300">
+                    <MapPin className="w-4 h-4 md:w-5 md:h-5" />
                   </div>
-                  <span className="text-2xl font-bold">15+</span>
+                  <span className="text-xl md:text-2xl font-bold">15+</span>
                 </div>
-                <span className="text-sm text-white/60 ml-[52px]">Kota Tujuan</span>
+                <span className="text-xs md:text-sm text-white/60 ml-10 md:ml-[52px]">Kota Tujuan</span>
               </div>
               <div className="group">
-                <div className="flex items-center gap-3 mb-1">
-                  <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors duration-300">
-                    <Calendar className="w-5 h-5" />
+                <div className="flex items-center gap-2 md:gap-3 mb-1">
+                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors duration-300">
+                    <Calendar className="w-4 h-4 md:w-5 md:h-5" />
                   </div>
-                  <span className="text-2xl font-bold">365</span>
+                  <span className="text-xl md:text-2xl font-bold">365</span>
                 </div>
-                <span className="text-sm text-white/60 ml-[52px]">Hari/Tahun</span>
+                <span className="text-xs md:text-sm text-white/60 ml-10 md:ml-[52px]">Hari/Tahun</span>
               </div>
               <div className="group">
-                <div className="flex items-center gap-3 mb-1">
-                  <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors duration-300">
-                    <Star className="w-5 h-5" />
+                <div className="flex items-center gap-2 md:gap-3 mb-1">
+                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors duration-300">
+                    <Star className="w-4 h-4 md:w-5 md:h-5" />
                   </div>
-                  <span className="text-2xl font-bold">4.9</span>
+                  <span className="text-xl md:text-2xl font-bold">4.9</span>
                 </div>
-                <span className="text-sm text-white/60 ml-[52px]">Rating</span>
+                <span className="text-xs md:text-sm text-white/60 ml-10 md:ml-[52px]">Rating</span>
               </div>
             </div>
           </div>
 
           {/* Search Card */}
-          <div ref={searchRef} className="lg:pl-8" style={{ willChange: 'transform' }}>
+          <div ref={searchRef} className="lg:pl-8 mt-4 lg:mt-0" style={{ willChange: 'transform' }}>
             <RouteSearch />
           </div>
         </div>
