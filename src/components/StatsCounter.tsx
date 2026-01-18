@@ -124,10 +124,10 @@ const StatsCounter = () => {
   };
 
   return (
-    <section ref={sectionRef} className="py-20 bg-gradient-to-br from-primary via-primary to-primary/90 relative overflow-hidden">
+    <section ref={sectionRef} className="py-12 md:py-20 bg-gradient-to-br from-primary via-primary to-primary/90 relative overflow-hidden">
       <div className="absolute inset-0">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-accent/10 rounded-full blur-3xl translate-x-1/3 translate-y-1/3" />
+        <div className="absolute top-0 left-0 w-64 md:w-96 h-64 md:h-96 bg-white/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+        <div className="absolute bottom-0 right-0 w-80 md:w-[500px] h-80 md:h-[500px] bg-accent/10 rounded-full blur-3xl translate-x-1/3 translate-y-1/3" />
       </div>
 
       <div className="absolute inset-0 opacity-[0.03]" style={{
@@ -135,55 +135,55 @@ const StatsCounter = () => {
         backgroundSize: '40px 40px'
       }} />
 
-      <div className="container relative z-10">
-        <div className="stats-title text-center mb-14">
-          <span className="inline-block px-5 py-2 bg-white/10 backdrop-blur-sm text-primary-foreground rounded-full text-sm font-semibold mb-4 border border-white/20">
+      <div className="container relative z-10 px-4 sm:px-6">
+        <div className="stats-title text-center mb-10 md:mb-14">
+          <span className="inline-block px-4 md:px-5 py-1.5 md:py-2 bg-white/10 backdrop-blur-sm text-primary-foreground rounded-full text-xs md:text-sm font-semibold mb-3 md:mb-4 border border-white/20">
             Pencapaian Kami
           </span>
-          <h2 className="font-display text-3xl md:text-5xl font-bold text-primary-foreground mb-4">
+          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground mb-3 md:mb-4">
             Dipercaya Ribuan Pelanggan
           </h2>
-          <p className="text-primary-foreground/70 max-w-xl mx-auto text-lg">
+          <p className="text-primary-foreground/70 max-w-xl mx-auto text-sm md:text-lg">
             Komitmen kami untuk memberikan pelayanan terbaik
           </p>
         </div>
 
-        <div className="stats-grid grid grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+        <div className="stats-grid grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 max-w-5xl mx-auto">
           {stats.map((stat, index) => (
             <div
               key={index}
-              className="stat-card group relative bg-white/10 backdrop-blur-sm rounded-2xl p-6 md:p-8 border border-white/20 hover:bg-white/20 transition-all duration-500 hover:-translate-y-2 text-center"
+              className="stat-card group relative bg-white/10 backdrop-blur-sm rounded-xl md:rounded-2xl p-4 sm:p-5 md:p-6 lg:p-8 border border-white/20 hover:bg-white/20 transition-all duration-500 hover:-translate-y-2 text-center"
             >
-              <div className={`w-16 h-16 mx-auto mb-5 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-500`}>
-                <stat.icon className="w-8 h-8 text-white" strokeWidth={1.5} />
+              <div className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 mx-auto mb-3 sm:mb-4 md:mb-5 rounded-xl md:rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-500`}>
+                <stat.icon className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white" strokeWidth={1.5} />
               </div>
 
-              <div className="text-4xl md:text-5xl font-bold text-primary-foreground mb-2 font-display">
+              <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground mb-1 md:mb-2 font-display">
                 {stat.value >= 1000 ? formatNumber(counts[index]) : counts[index]}
                 <span className="text-accent">{stat.suffix}</span>
               </div>
 
-              <p className="text-primary-foreground/70 font-medium">
+              <p className="text-primary-foreground/70 font-medium text-xs sm:text-sm md:text-base">
                 {stat.label}
               </p>
 
-              <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${stat.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500 blur-xl`} />
+              <div className={`absolute inset-0 rounded-xl md:rounded-2xl bg-gradient-to-br ${stat.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500 blur-xl`} />
             </div>
           ))}
         </div>
 
-        <div className="mt-14 flex flex-wrap justify-center gap-6 md:gap-10">
-          <div className="flex items-center gap-2 text-primary-foreground/60">
-            <Award className="w-5 h-5" />
-            <span className="text-sm font-medium">Terdaftar Resmi</span>
+        <div className="mt-10 md:mt-14 flex flex-wrap justify-center gap-4 md:gap-6 lg:gap-10">
+          <div className="flex items-center gap-1.5 md:gap-2 text-primary-foreground/60">
+            <Award className="w-4 h-4 md:w-5 md:h-5" />
+            <span className="text-xs md:text-sm font-medium">Terdaftar Resmi</span>
           </div>
-          <div className="flex items-center gap-2 text-primary-foreground/60">
-            <TrendingUp className="w-5 h-5" />
-            <span className="text-sm font-medium">Rating 4.9/5</span>
+          <div className="flex items-center gap-1.5 md:gap-2 text-primary-foreground/60">
+            <TrendingUp className="w-4 h-4 md:w-5 md:h-5" />
+            <span className="text-xs md:text-sm font-medium">Rating 4.9/5</span>
           </div>
-          <div className="flex items-center gap-2 text-primary-foreground/60">
-            <Users className="w-5 h-5" />
-            <span className="text-sm font-medium">Driver Profesional</span>
+          <div className="flex items-center gap-1.5 md:gap-2 text-primary-foreground/60">
+            <Users className="w-4 h-4 md:w-5 md:h-5" />
+            <span className="text-xs md:text-sm font-medium">Driver Profesional</span>
           </div>
         </div>
       </div>

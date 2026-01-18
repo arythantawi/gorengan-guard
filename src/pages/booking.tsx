@@ -490,23 +490,23 @@ const Booking = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <main className="pt-24 pb-16">
-          <div className="container max-w-2xl">
-            <div className="elevated-card p-8 text-center">
-              <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
-                <CheckCircle className="w-10 h-10 text-green-600 dark:text-green-400" />
+        <main className="pt-20 md:pt-24 pb-12 md:pb-16">
+          <div className="container px-4 sm:px-6 max-w-2xl">
+            <div className="elevated-card p-5 sm:p-6 md:p-8 text-center">
+              <div className="w-16 h-16 md:w-20 md:h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
+                <CheckCircle className="w-8 h-8 md:w-10 md:h-10 text-green-600 dark:text-green-400" />
               </div>
-              <h1 className="font-display text-2xl font-bold text-foreground mb-2">
+              <h1 className="font-display text-xl md:text-2xl font-bold text-foreground mb-2">
                 Pembayaran Sedang Diverifikasi
               </h1>
-              <p className="text-muted-foreground mb-6">
+              <p className="text-muted-foreground mb-4 md:mb-6 text-sm md:text-base">
                 Terima kasih, {formData.name}. Bukti pembayaran Anda sedang kami periksa. 
                 Konfirmasi akan dikirim melalui WhatsApp dalam 1x24 jam.
               </p>
               
-              <div className="bg-secondary/50 rounded-xl p-6 text-left mb-6">
-                <h3 className="font-semibold text-foreground mb-4">Detail Pemesanan</h3>
-                <div className="space-y-2 text-sm">
+              <div className="bg-secondary/50 rounded-lg md:rounded-xl p-4 md:p-6 text-left mb-4 md:mb-6">
+                <h3 className="font-semibold text-foreground mb-3 md:mb-4 text-sm md:text-base">Detail Pemesanan</h3>
+                <div className="space-y-2 text-xs md:text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Order ID</span>
                     <span className="font-mono font-bold">{orderId}</span>
@@ -576,18 +576,18 @@ const Booking = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <main className="pt-24 pb-16">
-          <div className="container max-w-4xl">
+        <main className="pt-20 md:pt-24 pb-12 md:pb-16">
+          <div className="container px-4 sm:px-6 max-w-4xl">
             <Button 
               variant="ghost" 
               onClick={() => setCurrentStep('form')}
-              className="mb-6"
+              className="mb-4 md:mb-6 text-sm"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Kembali ke Form
             </Button>
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-2 gap-4 md:gap-6">
               {/* Payment Info */}
               <div>
                 <PaymentInfoBooking orderId={orderId} totalPrice={totalPrice} />
@@ -601,12 +601,12 @@ const Booking = () => {
                 />
 
                 {/* Trip Summary */}
-                <div className="elevated-card p-6">
-                  <h3 className="font-display font-semibold text-foreground mb-4">
+                <div className="elevated-card p-4 md:p-6">
+                  <h3 className="font-display font-semibold text-foreground mb-3 md:mb-4 text-sm md:text-base">
                     Ringkasan Perjalanan
                   </h3>
                   
-                  <div className="space-y-3 text-sm">
+                  <div className="space-y-2 md:space-y-3 text-xs md:text-sm">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Rute</span>
                       <span className="font-medium text-foreground">
@@ -644,28 +644,28 @@ const Booking = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="pt-24 pb-16">
-        <div className="container max-w-4xl">
+      <main className="pt-20 md:pt-24 pb-12 md:pb-16">
+        <div className="container px-4 sm:px-6 max-w-4xl">
           <Button 
             variant="ghost" 
             onClick={() => navigate(-1)}
-            className="mb-6"
+            className="mb-4 md:mb-6 text-sm"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Kembali
           </Button>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-3 gap-4 md:gap-6">
             {/* Booking Form */}
             <div className="md:col-span-2">
-              <div className="glass-card rounded-2xl p-6">
-                <h1 className="font-display text-2xl font-bold text-foreground mb-6">
+              <div className="glass-card rounded-xl md:rounded-2xl p-4 sm:p-5 md:p-6">
+                <h1 className="font-display text-xl md:text-2xl font-bold text-foreground mb-4 md:mb-6">
                   Form Pemesanan
                 </h1>
                 
-                <form onSubmit={handleSubmit} className="space-y-5">
+                <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5">
                   <div>
-                    <label className="block text-sm font-medium text-muted-foreground mb-2">
+                    <label className="block text-xs md:text-sm font-medium text-muted-foreground mb-1.5 md:mb-2">
                       Nama Lengkap *
                     </label>
                     <div className="relative">
