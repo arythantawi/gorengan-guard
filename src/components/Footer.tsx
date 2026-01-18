@@ -158,9 +158,7 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
       {/* Bottom Bar */}
       <div className="border-t border-background/10">
         <div className="container px-4 sm:px-6 py-4 md:py-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-background/50 text-xs md:text-sm flex items-center gap-1 text-center md:text-left">
-            © {currentYear} 44 Trans Jawa Bali
-          </p>
+          
           <div className="flex items-center gap-4 md:gap-6 text-xs md:text-sm flex-wrap justify-center">
             <a href="#" className="text-background/50 hover:text-accent transition-colors">
               Syarat & Ketentuan
