@@ -173,7 +173,7 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
                 </div>
                 <div>
                   <p className="text-xs text-background/50">Telepon / WhatsApp</p>
-                  <p className="text-background font-medium">+62 812-3333-0042</p>
+                  <p className="text-background font-medium text-sm">+62 812-3333-0042</p>
                 </div>
               </a>
               <a
