@@ -458,9 +458,15 @@ const AdminUsers = () => {
                         <TableCell>{admin.phone_number || '-'}</TableCell>
                         <TableCell>
                           {admin.is_mfa_enabled ? (
-                            <CheckCircle2 className="w-4 h-4 text-green-500" />
+                            <div className="flex items-center gap-1">
+                              <CheckCircle2 className="w-4 h-4 text-green-500" />
+                              <span className="text-xs text-green-600">Aktif</span>
+                            </div>
                           ) : (
-                            <XCircle className="w-4 h-4 text-muted-foreground" />
+                            <div className="flex items-center gap-1">
+                              <Clock className="w-4 h-4 text-amber-500" />
+                              <span className="text-xs text-amber-600">Pending</span>
+                            </div>
                           )}
                         </TableCell>
                         <TableCell className="text-right space-x-1">
@@ -475,7 +481,7 @@ const AdminUsers = () => {
                           >
                             <Key className="w-4 h-4" />
                           </Button>
-                          {admin.is_mfa_enabled && (
+                          {admin.is_mfa_enabled ? (
                             <Button
                               variant="ghost"
                               size="sm"
@@ -487,6 +493,10 @@ const AdminUsers = () => {
                             >
                               <RotateCcw className="w-4 h-4 text-orange-500" />
                             </Button>
+                          ) : (
+                            <Badge variant="outline" className="text-xs text-muted-foreground">
+                              MFA saat login
+                            </Badge>
                           )}
                           {admin.role !== 'super_admin' && (
                             <AlertDialog>
