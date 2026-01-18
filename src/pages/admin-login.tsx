@@ -112,14 +112,9 @@ const AdminLogin = () => {
         setFactorId(verifiedFactor.id);
         setLoginStep('mfa-verify');
         setIsLoading(false);
-      } else if (isSuperAdmin) {
-        // Only super_admin MUST have MFA - require enrollment
-        await enrollMFA();
       } else {
-        // Regular admin without MFA can proceed directly
-        await logAdminLogin(authData.user.email || '');
-        toast.success('Login berhasil!');
-        navigate('/admin');
+        // All admin and super_admin MUST have MFA - require enrollment
+        await enrollMFA();
       }
     } catch (err) {
       console.error('Login error:', err);
@@ -382,7 +377,7 @@ const AdminLogin = () => {
         </div>
         <h3 className="font-semibold">Aktifkan Two-Factor Authentication</h3>
         <p className="text-sm text-muted-foreground">
-          Scan QR code di bawah dengan Google Authenticator atau aplikasi TOTP lainnya
+          MFA wajib untuk semua akun admin. Scan QR code dengan Google Authenticator atau aplikasi TOTP lainnya.
         </p>
       </div>
 
