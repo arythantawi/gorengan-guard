@@ -21,6 +21,8 @@ interface Banner {
 // Get aspect ratio class based on ratio string
 const getAspectRatioClass = (ratio: string | null): string => {
   switch (ratio) {
+    case '3:1': return 'aspect-[3/1]';
+    case '2.76:1': return 'aspect-[2.76/1]';
     case '21:9': return 'aspect-[21/9]';
     case '16:9': return 'aspect-video';
     case '3:2': return 'aspect-[3/2]';
@@ -35,6 +37,8 @@ const getAspectRatioClass = (ratio: string | null): string => {
 // Get mobile-friendly aspect ratio (portrait modes stay portrait, landscape modes are capped)
 const getMobileAspectRatioClass = (ratio: string | null): string => {
   switch (ratio) {
+    case '3:1': return 'aspect-[21/9]'; // Convert extra-wide to 21:9 on mobile
+    case '2.76:1': return 'aspect-[21/9]'; // Convert cinematic to 21:9 on mobile
     case '21:9': return 'aspect-video'; // Convert ultra-wide to 16:9 on mobile
     case '16:9': return 'aspect-video';
     case '3:2': return 'aspect-[3/2]';
