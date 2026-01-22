@@ -108,6 +108,11 @@ export default {
           "0%": { backgroundPosition: "200% center" },
           "100%": { backgroundPosition: "-200% center" },
         },
+        "scaleUp": {
+          "0%": { transform: "scale(1)" },
+          "50%": { transform: "scale(0.95)" },
+          "100%": { transform: "scale(1)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
