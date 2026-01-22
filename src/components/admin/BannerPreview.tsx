@@ -40,6 +40,8 @@ const convertGoogleDriveUrl = (url: string): string => {
 // Get aspect ratio class based on ratio string
 const getAspectRatioClass = (ratio: string): string => {
   switch (ratio) {
+    case '3:1': return 'aspect-[3/1]';
+    case '2.76:1': return 'aspect-[2.76/1]';
     case '21:9': return 'aspect-[21/9]';
     case '16:9': return 'aspect-video';
     case '3:2': return 'aspect-[3/2]';

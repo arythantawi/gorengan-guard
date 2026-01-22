@@ -953,7 +953,9 @@ const AdminContent = () => {
                   <SelectTrigger>
                     <SelectValue placeholder="Pilih aspect ratio" />
                   </SelectTrigger>
-                  <SelectContent>
+                <SelectContent>
+                    <SelectItem value="3:1">🎬 3:1 (Extra Wide)</SelectItem>
+                    <SelectItem value="2.76:1">🎥 2.76:1 (Cinematic)</SelectItem>
                     <SelectItem value="21:9">📐 21:9 (Ultra Wide)</SelectItem>
                     <SelectItem value="16:9">📺 16:9 (Landscape)</SelectItem>
                     <SelectItem value="3:2">📷 3:2 (Photo)</SelectItem>
