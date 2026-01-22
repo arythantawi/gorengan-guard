@@ -386,24 +386,24 @@ const HeroBanner = () => {
             className="relative w-full h-full cursor-pointer"
             onClick={isActive ? handleBannerClick : undefined}
           >
-            <div className="absolute inset-0 overflow-hidden bg-black flex items-center justify-center">
+            <div className="absolute inset-0 overflow-hidden">
               {hasImage ? (
                 <img 
                   ref={(el) => imageRefs.current[index] = el}
                   src={convertGoogleDriveUrl(banner.image_url)!}
                   alt={banner.title}
-                  className="max-w-full max-h-full w-auto h-auto object-contain"
+                  className="w-full h-[120%] object-cover -mt-[10%]"
                   draggable={false}
                   style={{ willChange: 'transform' }}
                 />
               ) : (
                 <div 
                   ref={(el) => imageRefs.current[index] = el}
-                  className="w-full h-full bg-gradient-to-br from-primary to-primary/80" 
+                  className="w-full h-[120%] -mt-[10%] bg-gradient-to-br from-primary to-primary/80" 
                 />
               )}
               {/* Gradient overlay for depth */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/10 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/10" />
             </div>
             
             {/* Text overlay for image_full */}
@@ -444,18 +444,13 @@ const HeroBanner = () => {
             )}
           </div>
         ) : layoutType === 'image_overlay' ? (
-          <div className="relative w-full h-full overflow-hidden bg-black">
+          <div className="relative w-full h-full overflow-hidden">
             {hasImage && (
               <div 
                 ref={(el) => imageRefs.current[index] = el}
-                className="absolute inset-0 flex items-center justify-center"
-                style={{ willChange: 'transform' }}
+                className="absolute inset-0 h-[120%] -mt-[10%] bg-cover bg-center"
+                style={{ backgroundImage: `url(${convertGoogleDriveUrl(banner.image_url)})`, willChange: 'transform' }}
               >
-                <img 
-                  src={convertGoogleDriveUrl(banner.image_url)!}
-                  alt={banner.title}
-                  className="max-w-full max-h-full w-auto h-auto object-contain"
-                />
                 <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30" />
               </div>
             )}
@@ -486,15 +481,15 @@ const HeroBanner = () => {
           <div className="relative w-full h-full flex flex-col">
             {hasImage ? (
               <>
-                <div className="flex-1 relative overflow-hidden bg-black flex items-center justify-center">
+                <div className="flex-1 relative overflow-hidden">
                   <img 
                     ref={(el) => imageRefs.current[index] = el}
                     src={convertGoogleDriveUrl(banner.image_url)!}
                     alt={banner.title}
-                    className="max-w-full max-h-full w-auto h-auto object-contain"
+                    className="w-full h-[120%] -mt-[10%] object-cover"
                     style={{ willChange: 'transform' }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                 </div>
                 <div className="slide-content bg-gradient-to-r from-primary via-primary to-primary/90 px-6 py-5 md:px-10 md:py-6">
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
