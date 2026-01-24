@@ -106,7 +106,7 @@ const HeroBanner = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTextVisible, setIsTextVisible] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(typeof window !== 'undefined' ? window.innerWidth >= 768 : false);
   
   const sectionRef = useRef<HTMLElement>(null);
   const slidesContainerRef = useRef<HTMLDivElement>(null);
@@ -114,6 +114,17 @@ const HeroBanner = () => {
   const imageRefs = useRef<(HTMLImageElement | HTMLDivElement | null)[]>([]);
   const textOverlayRef = useRef<HTMLDivElement>(null);
   const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Listen for resize to determine desktop/mobile - MUST be before any early returns
+  useEffect(() => {
+    const checkDesktop = () => {
+      setIsDesktop(window.innerWidth >= 768);
+    };
+    
+    checkDesktop();
+    window.addEventListener('resize', checkDesktop);
+    return () => window.removeEventListener('resize', checkDesktop);
+  }, []);
 
   // Animate slide transition with GSAP
   const animateSlide = useCallback((fromIndex: number, toIndex: number, direction: 'next' | 'prev') => {
@@ -653,16 +664,6 @@ const HeroBanner = () => {
     return r.replace(':', '/');
   };
 
-  // Listen for resize to determine desktop/mobile
-  useEffect(() => {
-    const checkDesktop = () => {
-      setIsDesktop(window.innerWidth >= 768);
-    };
-    
-    checkDesktop();
-    window.addEventListener('resize', checkDesktop);
-    return () => window.removeEventListener('resize', checkDesktop);
-  }, []);
 
   // Get the appropriate aspect ratio based on screen size
   const containerAspectRatio = isDesktop 
