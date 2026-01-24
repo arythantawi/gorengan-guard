@@ -947,13 +947,19 @@ const AdminContent = () => {
               <div className="space-y-2">
                 <Label>Aspect Ratio</Label>
                 <Select 
-                  value={bannerForm.aspect_ratio} 
-                  onValueChange={(value) => setBannerForm({...bannerForm, aspect_ratio: value})}
+                  value={bannerForm.aspect_ratio.includes('custom:') ? 'custom' : bannerForm.aspect_ratio} 
+                  onValueChange={(value) => {
+                    if (value === 'custom') {
+                      setBannerForm({...bannerForm, aspect_ratio: 'custom:16:9'});
+                    } else {
+                      setBannerForm({...bannerForm, aspect_ratio: value});
+                    }
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Pilih aspect ratio" />
                   </SelectTrigger>
-                <SelectContent>
+                  <SelectContent>
                     <SelectItem value="3:1">🎬 3:1 (Extra Wide)</SelectItem>
                     <SelectItem value="2.76:1">🎥 2.76:1 (Cinematic)</SelectItem>
                     <SelectItem value="21:9">📐 21:9 (Ultra Wide)</SelectItem>
@@ -963,8 +969,43 @@ const AdminContent = () => {
                     <SelectItem value="1:1">⬜ 1:1 (Square)</SelectItem>
                     <SelectItem value="3:4">📱 3:4 (Portrait)</SelectItem>
                     <SelectItem value="9:16">📲 9:16 (Mobile)</SelectItem>
+                    <SelectItem value="custom">✏️ Custom</SelectItem>
                   </SelectContent>
                 </Select>
+                {bannerForm.aspect_ratio.includes('custom:') && (
+                  <div className="flex items-center gap-2 mt-2">
+                    <Input 
+                      type="number"
+                      min="1"
+                      max="100"
+                      placeholder="W"
+                      className="w-20"
+                      value={bannerForm.aspect_ratio.split(':')[1] || '16'}
+                      onChange={(e) => {
+                        const width = e.target.value || '1';
+                        const height = bannerForm.aspect_ratio.split(':')[2] || '9';
+                        setBannerForm({...bannerForm, aspect_ratio: `custom:${width}:${height}`});
+                      }}
+                    />
+                    <span className="text-muted-foreground font-bold">:</span>
+                    <Input 
+                      type="number"
+                      min="1"
+                      max="100"
+                      placeholder="H"
+                      className="w-20"
+                      value={bannerForm.aspect_ratio.split(':')[2] || '9'}
+                      onChange={(e) => {
+                        const width = bannerForm.aspect_ratio.split(':')[1] || '16';
+                        const height = e.target.value || '1';
+                        setBannerForm({...bannerForm, aspect_ratio: `custom:${width}:${height}`});
+                      }}
+                    />
+                    <span className="text-xs text-muted-foreground">
+                      (Width : Height)
+                    </span>
+                  </div>
+                )}
                 <p className="text-xs text-muted-foreground">
                   Ukuran container banner di website
                 </p>

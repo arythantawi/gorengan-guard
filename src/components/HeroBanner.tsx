@@ -20,6 +20,16 @@ interface Banner {
 
 // Get aspect ratio class based on ratio string
 const getAspectRatioClass = (ratio: string | null): string => {
+  // Handle custom aspect ratio format: custom:width:height
+  if (ratio?.startsWith('custom:')) {
+    const parts = ratio.split(':');
+    if (parts.length === 3) {
+      const width = parseFloat(parts[1]) || 16;
+      const height = parseFloat(parts[2]) || 9;
+      return `aspect-[${width}/${height}]`;
+    }
+  }
+  
   switch (ratio) {
     case '3:1': return 'aspect-[3/1]';
     case '2.76:1': return 'aspect-[2.76/1]';
@@ -36,6 +46,21 @@ const getAspectRatioClass = (ratio: string | null): string => {
 
 // Get mobile-friendly aspect ratio (portrait modes stay portrait, landscape modes are capped)
 const getMobileAspectRatioClass = (ratio: string | null): string => {
+  // Handle custom aspect ratio format: custom:width:height
+  if (ratio?.startsWith('custom:')) {
+    const parts = ratio.split(':');
+    if (parts.length === 3) {
+      const width = parseFloat(parts[1]) || 16;
+      const height = parseFloat(parts[2]) || 9;
+      const aspectValue = width / height;
+      // For very wide custom ratios, cap at 21:9 on mobile
+      if (aspectValue > 2.33) {
+        return 'aspect-[21/9]';
+      }
+      return `aspect-[${width}/${height}]`;
+    }
+  }
+  
   switch (ratio) {
     case '3:1': return 'aspect-[21/9]'; // Convert extra-wide to 21:9 on mobile
     case '2.76:1': return 'aspect-[21/9]'; // Convert cinematic to 21:9 on mobile
