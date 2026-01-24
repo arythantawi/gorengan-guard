@@ -627,8 +627,28 @@ const HeroBanner = () => {
   // Convert aspect ratio string to CSS value
   const getAspectValue = (ratio: string | null, isMobile: boolean = false): string => {
     const r = ratio || '16:9';
+    
+    // Handle custom aspect ratio format: custom:width:height
+    if (r.startsWith('custom:')) {
+      const parts = r.split(':');
+      if (parts.length === 3) {
+        const width = parseFloat(parts[1]) || 16;
+        const height = parseFloat(parts[2]) || 9;
+        const aspectValue = width / height;
+        
+        // On mobile, cap very wide ratios at 21:9 (2.33)
+        if (isMobile && aspectValue > 2.33) {
+          return '21/9';
+        }
+        return `${width}/${height}`;
+      }
+    }
+    
     // On mobile, convert ultra-wide to standard wide
-    if (isMobile && r === '21:9') return '16/9';
+    if (isMobile) {
+      if (r === '21:9' || r === '3:1' || r === '2.76:1') return '16/9';
+    }
+    
     return r.replace(':', '/');
   };
 

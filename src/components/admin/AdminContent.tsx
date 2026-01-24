@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   Plus, 
@@ -140,8 +140,6 @@ const AdminContent = () => {
   const [bannerForm, setBannerForm] = useState({
     title: '', subtitle: '', image_url: '', link_url: '', button_text: '', display_order: 0, is_active: true, layout_type: 'image_caption', aspect_ratio: '16:9'
   });
-  const [detectedAspectRatio, setDetectedAspectRatio] = useState<string | null>(null);
-  const [isDetectingRatio, setIsDetectingRatio] = useState(false);
 
   // Promos state
   const [promos, setPromos] = useState<Promo[]>([]);
@@ -223,69 +221,8 @@ const AdminContent = () => {
   }, []);
 
   // Banner handlers
-  // Detect image aspect ratio from URL and optionally auto-set (only if not custom)
-  const detectImageAspectRatio = useCallback(async (imageUrl: string, autoSet: boolean = false) => {
-    if (!imageUrl) {
-      setDetectedAspectRatio(null);
-      return;
-    }
-    
-    setIsDetectingRatio(true);
-    const convertedUrl = convertGoogleDriveUrl(imageUrl);
-    
-    const img = new window.Image();
-    img.crossOrigin = 'anonymous';
-    
-    img.onload = () => {
-      const width = img.naturalWidth;
-      const height = img.naturalHeight;
-      const ratio = width / height;
-      
-      // Determine closest common aspect ratio
-      let detected = '16:9';
-      if (ratio >= 2.2) detected = '21:9';
-      else if (ratio >= 1.7) detected = '16:9';
-      else if (ratio >= 1.4) detected = '3:2';
-      else if (ratio >= 1.2) detected = '4:3';
-      else if (ratio >= 0.9) detected = '1:1';
-      else if (ratio >= 0.7) detected = '3:4';
-      else detected = '9:16';
-      
-      setDetectedAspectRatio(`${detected} (${width}×${height}px)`);
-      setIsDetectingRatio(false);
-      
-      // Auto-set aspect ratio if enabled AND current aspect ratio is NOT custom
-      if (autoSet) {
-        setBannerForm(prev => {
-          // Don't override if user has set a custom aspect ratio
-          if (prev.aspect_ratio?.startsWith('custom:')) {
-            return prev;
-          }
-          return { ...prev, aspect_ratio: detected };
-        });
-      }
-    };
-    
-    img.onerror = () => {
-      setDetectedAspectRatio(null);
-      setIsDetectingRatio(false);
-    };
-    
-    img.src = convertedUrl;
-  }, []);
-
-  // Apply detected aspect ratio to form
-  const applyDetectedAspectRatio = useCallback(() => {
-    if (!detectedAspectRatio) return;
-    // Extract ratio from string like "16:9 (1920×1080px)"
-    const ratioMatch = detectedAspectRatio.match(/^(\d+:\d+)/);
-    if (ratioMatch) {
-      setBannerForm(prev => ({ ...prev, aspect_ratio: ratioMatch[1] }));
-    }
-  }, [detectedAspectRatio]);
 
   const openBannerDialog = (banner?: Banner) => {
-    setDetectedAspectRatio(null);
     if (banner) {
       setEditingBanner(banner);
       setBannerForm({
@@ -299,10 +236,6 @@ const AdminContent = () => {
         layout_type: banner.layout_type || 'image_caption',
         aspect_ratio: banner.aspect_ratio || '16:9',
       });
-      // Detect aspect ratio for existing image
-      if (banner.image_url) {
-        detectImageAspectRatio(banner.image_url);
-      }
     } else {
       setEditingBanner(null);
       setBannerForm({ title: '', subtitle: '', image_url: '', link_url: '', button_text: '', display_order: 0, is_active: true, layout_type: 'image_caption', aspect_ratio: '16:9' });
@@ -1031,38 +964,12 @@ const AdminContent = () => {
                 <Label>URL Gambar</Label>
                 <Input 
                   value={bannerForm.image_url} 
-                  onChange={(e) => {
-                    setBannerForm({...bannerForm, image_url: e.target.value});
-                    // Auto-detect and auto-set aspect ratio
-                    detectImageAspectRatio(e.target.value, true);
-                  }} 
+                  onChange={(e) => setBannerForm({...bannerForm, image_url: e.target.value})} 
                   placeholder="https://drive.google.com/file/d/.../view" 
                 />
                 <p className="text-xs text-muted-foreground">
                   ✅ Mendukung link Google Drive atau link langsung
                 </p>
-                {isDetectingRatio && (
-                  <p className="text-xs text-primary flex items-center gap-1">
-                    <RefreshCw className="w-3 h-3 animate-spin" />
-                    Mendeteksi ukuran gambar...
-                  </p>
-                )}
-                {detectedAspectRatio && (
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
-                      📏 Terdeteksi: {detectedAspectRatio}
-                    </p>
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      size="sm" 
-                      className="h-6 text-xs px-2"
-                      onClick={applyDetectedAspectRatio}
-                    >
-                      Terapkan
-                    </Button>
-                  </div>
-                )}
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
