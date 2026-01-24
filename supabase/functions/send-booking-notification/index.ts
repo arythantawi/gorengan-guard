@@ -60,6 +60,17 @@ interface BookingNotificationRequest {
   dropoffAddress?: string;
 }
 
+// HTML escape function to prevent XSS attacks
+const escapeHtml = (text: string | undefined | null): string => {
+  if (!text) return '';
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+};
+
 const formatPrice = (price: number) => {
   return new Intl.NumberFormat('id-ID', {
     style: 'currency',
@@ -114,10 +125,21 @@ const handler = async (req: Request): Promise<Response> => {
       }
     }
     
-    // Build email content
-    const routeText = booking.routeVia 
-      ? `${booking.routeFrom} → ${booking.routeVia} → ${booking.routeTo}`
-      : `${booking.routeFrom} → ${booking.routeTo}`;
+    // Build email content - escape all user-supplied data to prevent XSS
+    const safeCustomerName = escapeHtml(booking.customerName);
+    const safeCustomerPhone = escapeHtml(booking.customerPhone);
+    const safeCustomerEmail = escapeHtml(booking.customerEmail);
+    const safeRouteFrom = escapeHtml(booking.routeFrom);
+    const safeRouteTo = escapeHtml(booking.routeTo);
+    const safeRouteVia = escapeHtml(booking.routeVia);
+    const safePickupTime = escapeHtml(booking.pickupTime);
+    const safePickupAddress = escapeHtml(booking.pickupAddress);
+    const safeDropoffAddress = escapeHtml(booking.dropoffAddress);
+    const safeOrderId = escapeHtml(booking.orderId);
+    
+    const routeText = safeRouteVia 
+      ? `${safeRouteFrom} → ${safeRouteVia} → ${safeRouteTo}`
+      : `${safeRouteFrom} → ${safeRouteTo}`;
     
     const emailHtml = `
       <!DOCTYPE html>
@@ -147,23 +169,23 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
           <div class="content">
             <div class="highlight">
-              <strong>Order ID:</strong> ${booking.orderId}<br>
+              <strong>Order ID:</strong> ${safeOrderId}<br>
               <span class="badge">Menunggu Pembayaran</span>
             </div>
             
             <h3 style="margin-top: 0;">📋 Detail Pesanan</h3>
             <div class="info-row">
               <span class="info-label">Nama:</span>
-              <span class="info-value">${booking.customerName}</span>
+              <span class="info-value">${safeCustomerName}</span>
             </div>
             <div class="info-row">
               <span class="info-label">No. Telepon:</span>
-              <span class="info-value">${booking.customerPhone}</span>
+              <span class="info-value">${safeCustomerPhone}</span>
             </div>
-            ${booking.customerEmail ? `
+            ${safeCustomerEmail ? `
             <div class="info-row">
               <span class="info-label">Email:</span>
-              <span class="info-value">${booking.customerEmail}</span>
+              <span class="info-value">${safeCustomerEmail}</span>
             </div>
             ` : ''}
             
@@ -178,7 +200,7 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
             <div class="info-row">
               <span class="info-label">Jam Jemput:</span>
-              <span class="info-value">${booking.pickupTime} WIB</span>
+              <span class="info-value">${safePickupTime} WIB</span>
             </div>
             <div class="info-row">
               <span class="info-label">Penumpang:</span>
@@ -188,12 +210,12 @@ const handler = async (req: Request): Promise<Response> => {
             <h3>📍 Alamat</h3>
             <div class="info-row">
               <span class="info-label">Penjemputan:</span>
-              <span class="info-value">${booking.pickupAddress.replace(/\n/g, '<br>')}</span>
+              <span class="info-value">${safePickupAddress.replace(/\n/g, '<br>')}</span>
             </div>
-            ${booking.dropoffAddress ? `
+            ${safeDropoffAddress ? `
             <div class="info-row">
               <span class="info-label">Pengantaran:</span>
-              <span class="info-value">${booking.dropoffAddress.replace(/\n/g, '<br>')}</span>
+              <span class="info-value">${safeDropoffAddress.replace(/\n/g, '<br>')}</span>
             </div>
             ` : ''}
             
@@ -217,7 +239,7 @@ const handler = async (req: Request): Promise<Response> => {
     for (const email of adminEmails) {
       const result = await sendEmail(
         email,
-        `🆕 Pesanan Baru: ${booking.orderId} - ${booking.customerName}`,
+        `🆕 Pesanan Baru: ${safeOrderId} - ${safeCustomerName}`,
         emailHtml
       );
       emailResults.push(result);
@@ -242,19 +264,19 @@ const handler = async (req: Request): Promise<Response> => {
         <body>
           <div class="container">
             <div class="header">
-              <h1>Terima Kasih, ${booking.customerName}!</h1>
+              <h1>Terima Kasih, ${safeCustomerName}!</h1>
               <p>Pesanan Anda telah kami terima</p>
             </div>
             <div class="content">
               <div class="highlight">
-                <p style="margin: 0;"><strong>Nomor Pesanan:</strong> ${booking.orderId}</p>
+                <p style="margin: 0;"><strong>Nomor Pesanan:</strong> ${safeOrderId}</p>
                 <p style="margin: 5px 0 0;">Simpan nomor ini untuk melacak status pesanan Anda</p>
               </div>
               
               <h3>Rincian Perjalanan</h3>
               <p><strong>Rute:</strong> ${routeText}</p>
               <p><strong>Tanggal:</strong> ${formatDate(booking.travelDate)}</p>
-              <p><strong>Jam Jemput:</strong> ${booking.pickupTime} WIB</p>
+              <p><strong>Jam Jemput:</strong> ${safePickupTime} WIB</p>
               <p><strong>Jumlah Penumpang:</strong> ${booking.passengers} orang</p>
               <p><strong>Total:</strong> ${formatPrice(booking.totalPrice)}</p>
               
@@ -274,7 +296,7 @@ const handler = async (req: Request): Promise<Response> => {
       
       const customerResult = await sendEmail(
         booking.customerEmail,
-        `Konfirmasi Pesanan ${booking.orderId} - 44 Trans Jawa Bali`,
+        `Konfirmasi Pesanan ${safeOrderId} - 44 Trans Jawa Bali`,
         customerEmailHtml
       );
       emailResults.push(customerResult);
