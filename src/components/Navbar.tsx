@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { Menu, X, Phone, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import logo44Trans from '@/assets/logo-44trans.png';
-
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -54,7 +53,7 @@ const Navbar = () => {
             <button className="cta-btn relative flex justify-center items-center rounded-md bg-[#183153] shadow-[0px_6px_24px_0px_rgba(0,0,0,0.2)] overflow-hidden cursor-pointer border-none group">
               <span className="absolute inset-0 w-0 bg-accent transition-all duration-400 ease-in-out right-0 group-hover:w-full group-hover:left-0" />
               <span className="relative text-center w-full px-5 py-3 text-white text-sm font-bold tracking-[0.2em] z-20 transition-all duration-300 ease-in-out group-hover:text-[#183153] group-hover:animate-[scaleUp_0.3s_ease-in-out]">
-                PESAN SEKARANG
+                ​LOGIN
               </span>
             </button>
           </div>
