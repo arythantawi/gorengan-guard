@@ -1,6 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Clock, MapPin, Users, Calendar, User, Phone, Mail, MapPinned, CheckCircle, Printer, Navigation, Edit3, Loader2, Map, AlertTriangle, Building2 } from 'lucide-react';
+import { ArrowLeft, Clock, MapPin, Users, Calendar, User, Phone, Mail, MapPinned, CheckCircle, Printer, Navigation, Edit3, Loader2, Map, AlertTriangle, Building2, LogIn } from 'lucide-react';
 
 // Lazy load MiniMap to avoid SSR issues with Leaflet
 const MiniMap = lazy(() => import('@/components/MiniMap'));
@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { generateTicketPdf } from '@/lib/generateTicketPdf';
 import { getRoutePrice } from '@/lib/scheduleData';
+import { useAuth } from '@/hooks/useAuth';
 
 type BookingStep = 'form' | 'payment' | 'success';
 type AddressMode = 'gps' | 'manual';
@@ -22,6 +23,7 @@ type AddressMode = 'gps' | 'manual';
 const Booking = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { user, isLoading: authLoading } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState<BookingStep>('form');
   const [orderId, setOrderId] = useState<string>('');
@@ -79,6 +81,63 @@ const Booking = () => {
     dropoffAddress: '',
     notes: '',
   });
+
+  // Pre-fill form with user data if logged in
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        name: user.user_metadata?.full_name || prev.name,
+        email: user.email || prev.email,
+      }));
+    }
+  }, [user]);
+
+  // Show login required screen if not authenticated
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-secondary via-background to-secondary">
+        <Navbar />
+        <div className="container max-w-lg mx-auto px-4 pt-24 pb-16">
+          <div className="bg-card rounded-2xl shadow-xl p-8 text-center">
+            <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+              <LogIn className="w-10 h-10 text-primary" />
+            </div>
+            <h1 className="text-2xl font-bold text-foreground mb-3">Login Diperlukan</h1>
+            <p className="text-muted-foreground mb-6">
+              Silakan login atau daftar terlebih dahulu untuk melakukan pemesanan tiket.
+            </p>
+            <div className="flex flex-col gap-3">
+              <Button 
+                onClick={() => navigate('/auth')}
+                className="w-full bg-primary hover:bg-primary/90"
+              >
+                <LogIn className="w-4 h-4 mr-2" />
+                Login / Daftar
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => navigate('/')}
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Kembali ke Beranda
+              </Button>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return '';
