@@ -8,12 +8,14 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import RouteCleanup from "@/components/RouteCleanup";
 import LoadingScreen from "@/components/LoadingScreen";
 import { SiteDataProvider } from "@/hooks/useSiteData";
+import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/index";
 import SearchResults from "./pages/search-results";
 import Booking from "./pages/booking";
 import TrackBooking from "./pages/track-booking";
 import Admin from "./pages/admin";
 import AdminLogin from "./pages/admin-login";
+import Auth from "./pages/auth";
 import NotFound from "./pages/not-found";
 
 const queryClient = new QueryClient();
@@ -43,24 +45,27 @@ const App = () => {
         <Toaster />
         <Sonner />
         {isLoading && <LoadingScreen onComplete={handleLoadingComplete} />}
-        {showApp && (
-          <SiteDataProvider>
-            <BrowserRouter>
-              <RouteCleanup />
-              <ErrorBoundary>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/search" element={<SearchResults />} />
-                  <Route path="/booking" element={<Booking />} />
-                  <Route path="/track" element={<TrackBooking />} />
-                  <Route path="/admin/login" element={<AdminLogin />} />
-                  <Route path="/admin" element={<Admin />} />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </ErrorBoundary>
-            </BrowserRouter>
-          </SiteDataProvider>
+{showApp && (
+          <AuthProvider>
+            <SiteDataProvider>
+              <BrowserRouter>
+                <RouteCleanup />
+                <ErrorBoundary>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/search" element={<SearchResults />} />
+                    <Route path="/booking" element={<Booking />} />
+                    <Route path="/track" element={<TrackBooking />} />
+                    <Route path="/auth" element={<Auth />} />
+                    <Route path="/admin/login" element={<AdminLogin />} />
+                    <Route path="/admin" element={<Admin />} />
+                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </ErrorBoundary>
+              </BrowserRouter>
+            </SiteDataProvider>
+          </AuthProvider>
         )}
       </TooltipProvider>
     </QueryClientProvider>

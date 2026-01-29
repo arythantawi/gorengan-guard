@@ -49,13 +49,13 @@ const Navbar = () => {
             </Link>
           </div>
 
-          <div className="hidden md:flex items-center gap-4">
-            <button className="cta-btn relative flex justify-center items-center rounded-md bg-[#183153] shadow-[0px_6px_24px_0px_rgba(0,0,0,0.2)] overflow-hidden cursor-pointer border-none group">
+<div className="hidden md:flex items-center gap-4">
+            <Link to="/auth" className="cta-btn relative flex justify-center items-center rounded-md bg-[#183153] shadow-[0px_6px_24px_0px_rgba(0,0,0,0.2)] overflow-hidden cursor-pointer border-none group">
               <span className="absolute inset-0 w-0 bg-accent transition-all duration-400 ease-in-out right-0 group-hover:w-full group-hover:left-0" />
               <span className="relative text-center w-full px-5 py-3 text-white text-sm font-bold tracking-[0.2em] z-20 transition-all duration-300 ease-in-out group-hover:text-[#183153] group-hover:animate-[scaleUp_0.3s_ease-in-out]">
-                ​LOGIN
+                LOGIN
               </span>
-            </button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -78,12 +78,12 @@ const Navbar = () => {
                 <Phone className="w-4 h-4" />
                 <span>0812-3456-7890</span>
               </a>
-              <button className="cta-btn relative flex justify-center items-center rounded-md bg-[#183153] shadow-[0px_6px_24px_0px_rgba(0,0,0,0.2)] overflow-hidden cursor-pointer border-none group mx-4 mt-2 w-[calc(100%-2rem)]">
+<Link to="/auth" onClick={() => setIsMobileMenuOpen(false)} className="cta-btn relative flex justify-center items-center rounded-md bg-[#183153] shadow-[0px_6px_24px_0px_rgba(0,0,0,0.2)] overflow-hidden cursor-pointer border-none group mx-4 mt-2 w-[calc(100%-2rem)]">
                 <span className="absolute inset-0 w-0 bg-accent transition-all duration-400 ease-in-out right-0 group-hover:w-full group-hover:left-0" />
                 <span className="relative text-center w-full px-5 py-3 text-white text-sm font-bold tracking-[0.2em] z-20 transition-all duration-300 ease-in-out group-hover:text-[#183153] group-hover:animate-[scaleUp_0.3s_ease-in-out]">
-                  PESAN SEKARANG
+                  LOGIN / DAFTAR
                 </span>
-              </button>
+              </Link>
             </div>
           </div>}
       </div>
